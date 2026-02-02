@@ -1,0 +1,78 @@
+<div class="dashboard-container">
+
+  <div class="sidebar">
+    <h2>Estudiante</h2>
+    <a routerLink="/dashboard-estudiante">Inicio</a>
+    <a class="active">Agendar Tutoría</a>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h3>Agendar Tutoría</h3>
+    </div>
+
+    <div class="content">
+      <div class="card">
+
+        <div *ngIf="mensaje" class="alert-success">{{ mensaje }}</div>
+        <div *ngIf="error" class="alert-error">{{ error }}</div>
+
+        <form [formGroup]="form">
+
+          <!-- Tutor -->
+          <div class="form-group">
+            <label>Tutor</label>
+            <select formControlName="tutor_id" (change)="validarDisponibilidad()">
+              <option value="">Seleccione un tutor</option>
+              <option *ngFor="let t of tutores" [value]="t.id">
+                {{ t.nombre }} — {{ t.especialidad }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Fecha -->
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date"
+                   formControlName="fecha"
+                   (change)="validarDisponibilidad()">
+          </div>
+
+          <!-- Hora -->
+          <div class="form-group">
+            <label>Hora</label>
+            <input type="time"
+                   formControlName="hora"
+                   (change)="validarDisponibilidad()">
+          </div>
+
+          <!-- Materia -->
+          <div class="form-group">
+            <label>Materia</label>
+            <input type="text" formControlName="materia">
+          </div>
+
+          <!-- Tema -->
+          <div class="form-group">
+            <label>Tema específico</label>
+            <textarea formControlName="tema"></textarea>
+          </div>
+
+          <!-- Horarios alternativos -->
+          <div *ngIf="horariosAlternativos.length">
+            <p><strong>Horarios sugeridos:</strong></p>
+            <ul>
+              <li *ngFor="let h of horariosAlternativos">{{ h }}</li>
+            </ul>
+          </div>
+
+          <button class="btn btn-primary" type="button" (click)="agendar()">
+            Confirmar Agendamiento
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>

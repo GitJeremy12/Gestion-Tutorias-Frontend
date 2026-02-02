@@ -1,0 +1,39 @@
+<form [formGroup]="form" (ngSubmit)="guardar()">
+
+  <!-- Estudiante -->
+  <label>Estudiante</label>
+  <select formControlName="estudianteId">
+    <option value="">Seleccione</option>
+    <option *ngFor="let e of estudiantes" [value]="e.id">
+      {{ e.nombre }}
+    </option>
+  </select>
+
+  <!-- Fecha y hora -->
+  <label>Fecha y hora</label>
+  <input type="datetime-local" formControlName="fechaHora">
+
+  <!-- Materia -->
+  <label>Materia</label>
+  <input type="text" formControlName="materia">
+  <small *ngIf="form.get('materia')?.touched && form.get('materia')?.invalid">
+    La materia es obligatoria
+  </small>
+
+  <!-- Tema -->
+  <label>Tema</label>
+  <input type="text" formControlName="tema">
+
+  <!-- Observaciones -->
+  <label>Observaciones</label>
+  <textarea formControlName="observaciones"></textarea>
+
+  <!-- Duración -->
+  <label>Duración (minutos)</label>
+  <input type="number" formControlName="duracion">
+
+  <button type="submit">Guardar</button>
+
+  <p class="success" *ngIf="success">{{ success }}</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
+</form>
