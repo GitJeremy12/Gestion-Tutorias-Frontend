@@ -1,0 +1,51 @@
+<div class="card">
+
+  <h3>Mi Historial de Tutorías</h3>
+
+  <!-- Filtro -->
+  <input
+    type="text"
+    placeholder="Filtrar por materia"
+    [(ngModel)]="materiaFiltro"
+    (input)="filtrar()"
+  />
+
+  <!-- Tabla -->
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Materia</th>
+        <th>Tema</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of tutoriasFiltradas">
+        <td>{{ t.fecha | date:'short' }}</td>
+        <td>{{ t.materia }}</td>
+        <td>{{ t.tema }}</td>
+        <td>
+          <button (click)="verDetalle(t)">Ver Detalle</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal Detalle -->
+  <div class="modal" *ngIf="seleccionada">
+    <div class="modal-content">
+      <h4>Detalle de Tutoría</h4>
+
+      <p><strong>Estudiante:</strong> {{ seleccionada.estudiante }}</p>
+      <p><strong>Fecha:</strong> {{ seleccionada.fecha | date:'full' }}</p>
+      <p><strong>Materia:</strong> {{ seleccionada.materia }}</p>
+      <p><strong>Tema:</strong> {{ seleccionada.tema }}</p>
+      <p><strong>Observaciones:</strong> {{ seleccionada.observaciones }}</p>
+      <p><strong>Duración:</strong> {{ seleccionada.duracion }} min</p>
+
+      <button (click)="cerrarDetalle()">Cerrar</button>
+    </div>
+  </div>
+
+</div>

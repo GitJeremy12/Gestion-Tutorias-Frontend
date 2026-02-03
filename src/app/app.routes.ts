@@ -12,6 +12,9 @@ import { TutorGuard } from './auth/guards/tutor.guard';
 /* HU-02: Estudiante */
 import { AgendarTutoriaComponent } from './tutorias/agendar-tutoria/agendar-tutoria.component';
 
+/* HU-04: Estudiante */
+import { HistorialTutoriasComponent } from './tutorias/historial-tutorias/historial-tutorias.component';
+
 /* Dashboards */
 import { DashboardTutorComponent } from './dashboards/dashboard-tutor.component';
 import { DashboardEstudianteComponent } from './dashboards/dashboard-estudiante.component';
@@ -51,7 +54,11 @@ export const routes: Routes = [
     path: 'agendar-tutoria',
     component: AgendarTutoriaComponent,
     canActivate: [AuthGuard]
-  },
+  },{
+  path: 'historial',
+  component: HistorialTutoriasComponent,
+  canActivate: [AuthGuard]
+},
 
   /* Fallback */
   { path: '**', redirectTo: 'login' }

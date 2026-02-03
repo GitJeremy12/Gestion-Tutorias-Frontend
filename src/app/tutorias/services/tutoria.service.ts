@@ -52,4 +52,10 @@ export class TutoriaService {
   }): Observable<any> {
     return this.http.post(`${this.API_URL}/tutorias/agendar`, data);
   }
+  // HU-04: Historial
+getHistorial(params?: any) {
+  return this.http.get<any[]>(`${this.API_URL}/tutorias/historial`, {
+    params
+  });
+}
 }
