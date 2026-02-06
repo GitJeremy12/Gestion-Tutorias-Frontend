@@ -71,4 +71,20 @@ export class ReporteSemanalComponent implements AfterViewInit {
       }
     });
   }
+  exportarPDF() {
+  this.exportService.exportToPDF(
+    'Reporte Semanal de Tutorías',
+    ['materia', 'total'],
+    this.materiasMasSolicitadas,
+    'reporte-semanal'
+  );
+}
+
+exportarExcel() {
+  this.exportService.exportToExcel(
+    this.tutoresMasActivos,
+    'reporte-semanal'
+  );
+}
+
 }

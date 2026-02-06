@@ -56,4 +56,19 @@ export class ReporteEstudianteComponent implements OnInit {
         }
       });
   }
+  exportarPDF() {
+  this.exportService.exportToPDF(
+    'Reporte de Tutorías por Estudiante',
+    ['fecha', 'materia', 'tutor', 'observaciones'],
+    this.reporte,
+    'reporte-estudiante'
+  );
+}
+
+exportarExcel() {
+  this.exportService.exportToExcel(
+    this.reporte,
+    'reporte-estudiante'
+  );
+}
 }
