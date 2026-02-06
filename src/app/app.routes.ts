@@ -3,6 +3,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { FormTutoriaComponent } from './features/tutorias/registrar/form-tutoria.component';
 import { AgendarTutoriaComponent } from './features/tutorias/agendar/agendar-tutoria.component';
+import { HistorialComponent } from './features/tutorias/historial/historial.component';
 
 // app.routes.ts
 export const routes: Routes = [
@@ -32,6 +33,11 @@ export const routes: Routes = [
   {
   path: 'agendar-tutoria',
   component: AgendarTutoriaComponent,
+  canActivate: [authGuard]
+  },
+  {
+  path: 'historial',
+  component: HistorialComponent,
   canActivate: [authGuard]
   },
 

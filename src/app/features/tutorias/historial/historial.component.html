@@ -1,0 +1,45 @@
+<h2>Mi Historial de Tutorías</h2>
+
+<label>Filtrar por materia</label>
+<select [(ngModel)]="materiaFiltro" (change)="filtrarPorMateria()">
+  <option value="">Todas</option>
+  <option *ngFor="let m of materias" [value]="m">{{ m }}</option>
+</select>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Materia</th>
+      <th>Tema</th>
+      <th>Acción</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let t of tutoriasFiltradas">
+      <td>{{ t.fechaHora | date:'short' }}</td>
+      <td>{{ t.materia }}</td>
+      <td>{{ t.tema }}</td>
+      <td>
+        <button (click)="verDetalle(t)">Ver Detalle</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Modal simple -->
+<div class="modal" *ngIf="seleccionada">
+  <div class="modal-content">
+    <h3>Detalle de Tutoría</h3>
+
+    <p><b>Estudiante:</b> {{ seleccionada.estudiante?.nombre }}</p>
+    <p><b>Fecha:</b> {{ seleccionada.fechaHora | date:'full' }}</p>
+    <p><b>Materia:</b> {{ seleccionada.materia }}</p>
+    <p><b>Tema:</b> {{ seleccionada.tema }}</p>
+    <p><b>Observaciones:</b> {{ seleccionada.observaciones }}</p>
+    <p><b>Duración:</b> {{ seleccionada.duracion }} min</p>
+
+    <button (click)="cerrarDetalle()">Cerrar</button>
+  </div>
+</div>
