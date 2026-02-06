@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
-export class TutorGuard {
+export class TutorGuard implements CanActivate {
 
   constructor(private router: Router) {}
 
@@ -14,13 +14,22 @@ export class TutorGuard {
       return false;
     }
 
-    const role = JSON.parse(atob(token)).role;
+    try {
+      // 👉 decodificar SOLO el payload
+      const payload = JSON.parse(atob(token.split('.')[1]));
 
-    if (role !== 'tutor') {
+      if (payload.rol === 'tutor') {
+        return true;
+      }
+
+      this.router.navigate(['/login']);
+      return false;
+
+    } catch (error) {
+      // token corrupto o inválido
+      localStorage.removeItem('token');
       this.router.navigate(['/login']);
       return false;
     }
-
-    return true;
   }
 }
