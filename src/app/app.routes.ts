@@ -5,6 +5,10 @@ import { FormTutoriaComponent } from './features/tutorias/registrar/form-tutoria
 import { AgendarTutoriaComponent } from './features/tutorias/agendar/agendar-tutoria.component';
 import { HistorialComponent } from './features/tutorias/historial/historial.component';
 import { ReporteEstudianteComponent } from './features/reportes/por-estudiante/reporte-estudiante.component';
+import { DashboardAdminComponent } from './features/dashboards/dashboard-admin/dashboard-admin.component';
+import { DashboardTutorComponent } from './features/dashboards/dashboard-tutor/dashboard-tutor.component';
+import { DashboardEstudianteComponent } from './features/dashboards/dashboard-estudiante/dashboard-estudiante.component';
+import { RegisterComponent } from './features/auth/register/register.component';
 
 // app.routes.ts
 export const routes: Routes = [

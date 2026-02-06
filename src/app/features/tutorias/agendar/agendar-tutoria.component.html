@@ -1,49 +1,151 @@
-<h2>Agendar Tutoría</h2>
-
-<form #f="ngForm" (ngSubmit)="confirmar(f)">
-
-  <label>Tutor</label>
-  <select [(ngModel)]="form.tutorId"
-          name="tutorId"
-          required
-          (change)="validarHorario()">
-    <option value="">Seleccione</option>
-    <option *ngFor="let t of tutores" [value]="t.id">
-      {{ t.nombre }} – {{ t.especialidad }}
-    </option>
-  </select>
-
-  <label>Fecha y hora</label>
-  <input type="datetime-local"
-         [(ngModel)]="form.fechaHora"
-         name="fechaHora"
-         required
-         (change)="validarHorario()" />
-
-  <label>Materia</label>
-  <input type="text"
-         [(ngModel)]="form.materia"
-         name="materia"
-         required />
-
-  <label>Tema</label>
-  <input type="text"
-         [(ngModel)]="form.tema"
-         name="tema"
-         required />
-
-  <button type="submit" [disabled]="!disponible">
-    Confirmar Agendamiento
-  </button>
-
-  <p class="success" *ngIf="success">{{ success }}</p>
-  <p class="error" *ngIf="error">{{ error }}</p>
-
-  <div *ngIf="horariosAlternativos.length">
-    <p>Horarios alternativos:</p>
-    <ul>
-      <li *ngFor="let h of horariosAlternativos">{{ h }}</li>
-    </ul>
+<div class="schedule-container">
+  <div class="schedule-header">
+    <h2>Agendar Tutoría</h2>
+    <p class="subtitle">Selecciona tu tutor y horario preferido</p>
   </div>
 
-</form>
+  <form #f="ngForm" (ngSubmit)="confirmar(f)">
+
+    <!-- Selección de tutor -->
+    <div class="form-section">
+      <h3 class="section-title">Selecciona tu tutor</h3>
+
+      <div class="form-group">
+        <label for="tutorId">Tutor disponible</label>
+        <select
+          [(ngModel)]="form.tutorId"
+          id="tutorId"
+          name="tutorId"
+          required
+          (change)="onTutorChange()">
+          <option value="" disabled>Elige un tutor</option>
+          <option *ngFor="let t of tutores" [value]="t.id">
+            👨‍🏫 {{ t.nombre }} – {{ t.especialidad }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Info del tutor seleccionado -->
+      <div class="tutor-info" *ngIf="tutorSeleccionado">
+        <div class="info-card">
+          <span class="info-label">📚 Especialidad:</span>
+          <span class="info-value">{{ tutorSeleccionado.especialidad }}</span>
+        </div>
+        <div class="info-card" *ngIf="tutorSeleccionado.departamento">
+          <span class="info-label">🏢 Departamento:</span>
+          <span class="info-value">{{ tutorSeleccionado.departamento }}</span>
+        </div>
+        <div class="info-card" *ngIf="tutorSeleccionado.disponibilidad">
+          <span class="info-label">🕐 Disponibilidad:</span>
+          <span class="info-value">{{ tutorSeleccionado.disponibilidad }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalles de la tutoría -->
+    <div class="form-section">
+      <h3 class="section-title">Detalles de la tutoría</h3>
+
+      <div class="form-group">
+        <label for="materia">Materia</label>
+        <input
+          type="text"
+          id="materia"
+          [(ngModel)]="form.materia"
+          name="materia"
+          placeholder="Ej: Cálculo Diferencial"
+          required
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="tema">Tema específico</label>
+        <input
+          type="text"
+          id="tema"
+          [(ngModel)]="form.tema"
+          name="tema"
+          placeholder="Ej: Derivadas parciales"
+          required
+          autocomplete="off"
+        />
+        <small class="hint">Describe brevemente el tema que necesitas revisar</small>
+      </div>
+    </div>
+
+    <!-- Fecha y hora -->
+    <div class="form-section">
+      <h3 class="section-title">Fecha y hora</h3>
+
+      <div class="form-group">
+        <label for="fechaHora">Selecciona fecha y hora</label>
+        <input
+          type="datetime-local"
+          id="fechaHora"
+          [(ngModel)]="form.fechaHora"
+          name="fechaHora"
+          required
+          [min]="setMinDateTime()"
+          (change)="validarHorario()"
+        />
+        <small class="hint">Selecciona un horario dentro del horario laboral</small>
+      </div>
+
+      <!-- Indicador de disponibilidad -->
+      <div class="availability-indicator" *ngIf="form.fechaHora && form.tutorId">
+        <div class="indicator validating" *ngIf="validandoHorario">
+          <span class="indicator-icon">⏳</span>
+          <span class="indicator-text">Verificando disponibilidad...</span>
+        </div>
+        <div class="indicator available" *ngIf="disponible && !validandoHorario">
+          <span class="indicator-icon">✓</span>
+          <span class="indicator-text">Horario disponible</span>
+        </div>
+        <div class="indicator unavailable" *ngIf="!disponible && !validandoHorario && form.fechaHora">
+          <span class="indicator-icon">✕</span>
+          <span class="indicator-text">Horario no disponible</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Horarios alternativos -->
+    <div class="alternative-times" *ngIf="horariosAlternativos.length > 0">
+      <h4>📅 Horarios alternativos disponibles</h4>
+      <p class="alternative-subtitle">El horario seleccionado no está disponible. Prueba estos:</p>
+      <ul class="times-list">
+        <li *ngFor="let h of horariosAlternativos"
+            class="time-item"
+            (click)="seleccionarHorarioAlternativo(h)">
+          <span class="time-icon">🕐</span>
+          <span class="time-text">{{ formatearFecha(h) }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Mensajes de éxito/error -->
+    <p class="success" *ngIf="success">
+      <span class="success-icon">✓</span>
+      {{ success }}
+    </p>
+    <p class="error" *ngIf="error">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </p>
+
+    <!-- Botón de confirmación -->
+    <button
+      type="submit"
+      [disabled]="!f.form.valid || !disponible"
+      [class.disabled]="!disponible">
+      <span *ngIf="disponible">Confirmar agendamiento</span>
+      <span *ngIf="!disponible && form.tutorId && form.fechaHora">Selecciona un horario disponible</span>
+      <span *ngIf="!form.tutorId || !form.fechaHora">Completa el formulario</span>
+    </button>
+
+    <!-- Link de navegación -->
+    <div class="back-link">
+      <a href="#" routerLink="/mis-tutorias">← Volver a mis tutorías</a>
+    </div>
+  </form>
+</div>

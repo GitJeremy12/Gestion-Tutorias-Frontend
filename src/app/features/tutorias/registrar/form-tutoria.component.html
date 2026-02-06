@@ -1,48 +1,162 @@
-<h2>Registrar Tutoría</h2>
+<div class="register-tutoria-container">
+  <div class="register-header">
+    <h2>Registrar Tutoría</h2>
+    <p class="subtitle">Registra una tutoría realizada o programa una nueva</p>
+  </div>
 
-<form #f="ngForm" (ngSubmit)="guardar(f)">
+  <form #f="ngForm" (ngSubmit)="guardar(f)">
 
-  <label>Estudiante</label>
-  <select [(ngModel)]="form.estudianteId" name="estudianteId" required>
-    <option value="">Seleccione</option>
-    <option *ngFor="let e of estudiantes" [value]="e.id">
-      {{ e.nombre }}
-    </option>
-  </select>
+    <!-- Información del Estudiante -->
+    <div class="form-section">
+      <h3 class="section-title">Estudiante</h3>
 
-  <label>Fecha y hora</label>
-  <input type="datetime-local"
-         [(ngModel)]="form.fechaHora"
-         name="fechaHora"
-         required />
+      <div class="form-group">
+        <label for="estudianteId">Selecciona el estudiante</label>
+        <select
+          [(ngModel)]="form.estudianteId"
+          id="estudianteId"
+          name="estudianteId"
+          required
+          (change)="onEstudianteChange()">
+          <option value="" disabled>Selecciona un estudiante</option>
+          <option *ngFor="let e of estudiantes" [value]="e.id">
+            👨‍🎓 {{ e.nombre }} - {{ e.carrera || 'Sin carrera' }}
+          </option>
+        </select>
+      </div>
 
-  <label>Materia</label>
-  <input type="text"
-         [(ngModel)]="form.materia"
-         name="materia"
-         required />
-  <small class="error" *ngIf="!form.materia && error">
-    La materia es obligatoria
-  </small>
+      <!-- Info del estudiante seleccionado -->
+      <div class="estudiante-info" *ngIf="estudianteSeleccionado">
+        <div class="info-card">
+          <span class="info-icon">📚</span>
+          <div class="info-content">
+            <span class="info-label">Carrera</span>
+            <span class="info-value">{{ estudianteSeleccionado.carrera || 'No especificada' }}</span>
+          </div>
+        </div>
+        <div class="info-card" *ngIf="estudianteSeleccionado.semestre">
+          <span class="info-icon">📖</span>
+          <div class="info-content">
+            <span class="info-label">Semestre</span>
+            <span class="info-value">{{ estudianteSeleccionado.semestre }}°</span>
+          </div>
+        </div>
+        <div class="info-card" *ngIf="estudianteSeleccionado.email">
+          <span class="info-icon">📧</span>
+          <div class="info-content">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ estudianteSeleccionado.email }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <label>Tema</label>
-  <input type="text"
-         [(ngModel)]="form.tema"
-         name="tema" />
+    <!-- Fecha y Hora -->
+    <div class="form-section">
+      <h3 class="section-title">Fecha y Hora</h3>
 
-  <label>Observaciones</label>
-  <textarea [(ngModel)]="form.observaciones" name="observaciones"></textarea>
+      <div class="form-group">
+        <label for="fechaHora">Selecciona fecha y hora de la tutoría</label>
+        <input
+          type="datetime-local"
+          id="fechaHora"
+          [(ngModel)]="form.fechaHora"
+          name="fechaHora"
+          required
+          [max]="getMaxDateTime()"
+        />
+        <small class="hint">Puedes registrar tutorías pasadas o futuras</small>
+      </div>
+    </div>
 
-  <label>Duración (min)</label>
-  <input type="number"
-         [(ngModel)]="form.duracion"
-         name="duracion"
-         min="1"
-         required />
+    <!-- Detalles Académicos -->
+    <div class="form-section">
+      <h3 class="section-title">Detalles Académicos</h3>
 
-  <button type="submit">Guardar</button>
+      <div class="form-group">
+        <label for="materia">Materia</label>
+        <input
+          type="text"
+          id="materia"
+          [(ngModel)]="form.materia"
+          name="materia"
+          #materiaField="ngModel"
+          placeholder="Ej: Cálculo Diferencial"
+          required
+          autocomplete="off"
+        />
+        <small class="error-hint" *ngIf="materiaField.invalid && (materiaField.dirty || materiaField.touched)">
+          ⚠️ La materia es obligatoria
+        </small>
+      </div>
 
-  <p class="success" *ngIf="success">{{ success }}</p>
-  <p class="error" *ngIf="error && !success">{{ error }}</p>
+      <div class="form-group">
+        <label for="tema">Tema tratado</label>
+        <input
+          type="text"
+          id="tema"
+          [(ngModel)]="form.tema"
+          name="tema"
+          placeholder="Ej: Derivadas parciales"
+          autocomplete="off"
+        />
+        <small class="hint">Opcional: Describe el tema específico abordado</small>
+      </div>
 
-</form>
+      <div class="form-group">
+        <label for="duracion">Duración (minutos)</label>
+        <input
+          type="number"
+          id="duracion"
+          [(ngModel)]="form.duracion"
+          name="duracion"
+          #duracionField="ngModel"
+          min="15"
+          max="300"
+          step="15"
+          placeholder="60"
+          required
+        />
+        <small class="hint">Duración típica: 60 minutos</small>
+        <small class="error-hint" *ngIf="duracionField.invalid && (duracionField.dirty || duracionField.touched)">
+          ⚠️ La duración debe estar entre 15 y 300 minutos
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="observaciones">Observaciones</label>
+        <textarea
+          id="observaciones"
+          [(ngModel)]="form.observaciones"
+          name="observaciones"
+          rows="4"
+          placeholder="Escribe observaciones sobre la tutoría, temas pendientes, material necesario, etc."></textarea>
+        <small class="hint">Opcional: Notas adicionales sobre la sesión</small>
+      </div>
+    </div>
+
+    <!-- Mensajes de éxito/error -->
+    <p class="success" *ngIf="success">
+      <span class="success-icon">✓</span>
+      {{ success }}
+    </p>
+    <p class="error" *ngIf="error && !success">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </p>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="!f.form.valid || guardando">
+        <span *ngIf="!guardando">Guardar Tutoría</span>
+        <span *ngIf="guardando">
+          <span class="spinner-small"></span>
+          Guardando...
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

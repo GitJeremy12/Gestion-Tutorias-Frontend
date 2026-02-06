@@ -1,45 +1,292 @@
-<h2>Mi Historial de Tutorías</h2>
+<div class="history-container">
+  <!-- Header con botón de exportar -->
+  <div class="history-header">
+    <div class="header-content">
+      <div>
+        <h2>Mi Historial de Tutorías</h2>
+        <p class="subtitle">Revisa todas tus tutorías anteriores</p>
+      </div>
+      <button class="btn-export" (click)="exportarHistorial()" *ngIf="tutoriasFiltradas.length > 0 && !loading">
+        <span>📥</span>
+        Exportar CSV
+      </button>
+    </div>
+  </div>
 
-<label>Filtrar por materia</label>
-<select [(ngModel)]="materiaFiltro" (change)="filtrarPorMateria()">
-  <option value="">Todas</option>
-  <option *ngFor="let m of materias" [value]="m">{{ m }}</option>
-</select>
+  <!-- Estado de carga -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando historial...</p>
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Materia</th>
-      <th>Tema</th>
-      <th>Acción</th>
-    </tr>
-  </thead>
+  <!-- Contenido principal (solo si no está cargando) -->
+  <div *ngIf="!loading">
+    <!-- Filtros y estadísticas -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="materiaFiltro">
+          <span class="filter-icon">🔍</span>
+          Filtrar por materia
+        </label>
+        <select
+          [(ngModel)]="materiaFiltro"
+          id="materiaFiltro"
+          (change)="filtrarPorMateria()">
+          <option value="">Todas las materias</option>
+          <option *ngFor="let m of materias" [value]="m">{{ m }}</option>
+        </select>
+        <button class="btn-clear-filter" *ngIf="materiaFiltro" (click)="limpiarFiltros()">
+          <span>✕</span> Limpiar filtro
+        </button>
+      </div>
 
-  <tbody>
-    <tr *ngFor="let t of tutoriasFiltradas">
-      <td>{{ t.fechaHora | date:'short' }}</td>
-      <td>{{ t.materia }}</td>
-      <td>{{ t.tema }}</td>
-      <td>
-        <button (click)="verDetalle(t)">Ver Detalle</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+      <!-- Estadísticas -->
+      <div class="stats-cards">
+        <div class="stat-card">
+          <span class="stat-icon">📚</span>
+          <div class="stat-info">
+            <span class="stat-value">{{ tutoriasFiltradas.length }}</span>
+            <span class="stat-label">Tutorías</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon">📖</span>
+          <div class="stat-info">
+            <span class="stat-value">{{ materias.length }}</span>
+            <span class="stat-label">Materias</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<!-- Modal simple -->
-<div class="modal" *ngIf="seleccionada">
-  <div class="modal-content">
-    <h3>Detalle de Tutoría</h3>
+    <!-- Mensaje de error -->
+    <div class="error-message" *ngIf="error">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </div>
 
-    <p><b>Estudiante:</b> {{ seleccionada.estudiante?.nombre }}</p>
-    <p><b>Fecha:</b> {{ seleccionada.fechaHora | date:'full' }}</p>
-    <p><b>Materia:</b> {{ seleccionada.materia }}</p>
-    <p><b>Tema:</b> {{ seleccionada.tema }}</p>
-    <p><b>Observaciones:</b> {{ seleccionada.observaciones }}</p>
-    <p><b>Duración:</b> {{ seleccionada.duracion }} min</p>
+    <!-- Tabla de tutorías -->
+    <div class="table-container">
+      <div class="table-wrapper" *ngIf="tutoriasFiltradas.length > 0; else noTutorias">
+        <table class="tutorias-table">
+          <thead>
+            <tr>
+              <th>Fecha y Hora</th>
+              <th>Materia</th>
+              <th>Tema</th>
+              <th>Tutor</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of tutoriasFiltradas; let i = index"
+                [class.row-even]="i % 2 === 0"
+                class="table-row">
+              <td data-label="Fecha y Hora">
+                <div class="date-cell">
+                  <span class="date-icon">📅</span>
+                  <div class="date-info">
+                    <span class="date-day">{{ t.fechaHora | date:'dd/MM/yyyy' }}</span>
+                    <span class="date-time">{{ t.fechaHora | date:'HH:mm' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td data-label="Materia">
+                <span class="materia-badge">{{ t.materia }}</span>
+              </td>
+              <td data-label="Tema">
+                <span class="tema-text">{{ t.tema }}</span>
+              </td>
+              <td data-label="Tutor">
+                <div class="tutor-cell">
+                  <span class="tutor-icon">👨‍🏫</span>
+                  <span class="tutor-name">{{ t.tutor?.nombre || 'N/A' }}</span>
+                </div>
+              </td>
+              <td data-label="Estado">
+                <span class="status-badge" [ngClass]="getStatusClass(t)">
+                  {{ getStatusText(t) }}
+                </span>
+              </td>
+              <td data-label="Acciones">
+                <button class="btn-detail" (click)="verDetalle(t)">
+                  <span class="btn-icon">👁️</span>
+                  Ver detalle
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <button (click)="cerrarDetalle()">Cerrar</button>
+      <!-- Mensaje cuando no hay tutorías -->
+      <ng-template #noTutorias>
+        <div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <h3>No hay tutorías registradas</h3>
+          <p *ngIf="materiaFiltro">No se encontraron tutorías para la materia "{{ materiaFiltro }}"</p>
+          <p *ngIf="!materiaFiltro">Aún no has agendado ninguna tutoría</p>
+          <button class="btn-primary" routerLink="/agendar">
+            Agendar mi primera tutoría
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Modal de detalle -->
+  <div class="modal-overlay" *ngIf="seleccionada" (click)="cerrarDetalle()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Detalle de Tutoría</h3>
+        <button class="btn-close" (click)="cerrarDetalle()" aria-label="Cerrar">
+          <span>✕</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Estado destacado -->
+        <div class="detail-section">
+          <div class="status-display">
+            <span class="status-badge large" [ngClass]="getStatusClass(seleccionada)">
+              {{ getStatusText(seleccionada) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Información General -->
+        <div class="detail-section">
+          <h4>Información General</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-icon">👨‍🎓</span>
+              <div class="detail-content">
+                <span class="detail-label">Estudiante</span>
+                <span class="detail-value">{{ seleccionada.estudiante?.nombre || 'No disponible' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">👨‍🏫</span>
+              <div class="detail-content">
+                <span class="detail-label">Tutor</span>
+                <span class="detail-value">{{ seleccionada.tutor?.nombre || 'No disponible' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">📅</span>
+              <div class="detail-content">
+                <span class="detail-label">Fecha</span>
+                <span class="detail-value">{{ seleccionada.fechaHora | date:'fullDate':'':'es-ES' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">🕐</span>
+              <div class="detail-content">
+                <span class="detail-label">Hora</span>
+                <span class="detail-value">{{ seleccionada.fechaHora | date:'HH:mm' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">⏱️</span>
+              <div class="detail-content">
+                <span class="detail-label">Duración</span>
+                <span class="detail-value">{{ formatearDuracion(seleccionada.duracion) }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item" *ngIf="seleccionada.tutor?.especialidad">
+              <span class="detail-icon">🎓</span>
+              <div class="detail-content">
+                <span class="detail-label">Especialidad</span>
+                <span class="detail-value">{{ seleccionada.tutor.especialidad }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalles Académicos -->
+        <div class="detail-section">
+          <h4>Detalles Académicos</h4>
+          <div class="detail-grid">
+            <div class="detail-item full-width">
+              <span class="detail-icon">📚</span>
+              <div class="detail-content">
+                <span class="detail-label">Materia</span>
+                <span class="detail-value">{{ seleccionada.materia }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item full-width">
+              <span class="detail-icon">📖</span>
+              <div class="detail-content">
+                <span class="detail-label">Tema</span>
+                <span class="detail-value">{{ seleccionada.tema }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item full-width" *ngIf="seleccionada.observaciones">
+              <span class="detail-icon">📝</span>
+              <div class="detail-content">
+                <span class="detail-label">Observaciones</span>
+                <span class="detail-value">{{ seleccionada.observaciones }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item full-width" *ngIf="!seleccionada.observaciones">
+              <span class="detail-icon">📝</span>
+              <div class="detail-content">
+                <span class="detail-label">Observaciones</span>
+                <span class="detail-value no-data">Sin observaciones registradas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de contacto (si está disponible) -->
+        <div class="detail-section" *ngIf="seleccionada.estudiante?.email || seleccionada.estudiante?.telefono">
+          <h4>Información de Contacto</h4>
+          <div class="detail-grid">
+            <div class="detail-item full-width" *ngIf="seleccionada.estudiante?.email">
+              <span class="detail-icon">📧</span>
+              <div class="detail-content">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">{{ seleccionada.estudiante.email }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item full-width" *ngIf="seleccionada.estudiante?.telefono">
+              <span class="detail-icon">📱</span>
+              <div class="detail-content">
+                <span class="detail-label">Teléfono</span>
+                <span class="detail-value">{{ seleccionada.estudiante.telefono }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarDetalle()">
+          Cerrar
+        </button>
+        <button class="btn-danger"
+                *ngIf="puedeReagendar(seleccionada)"
+                (click)="cancelarTutoria(seleccionada)">
+          <span>🚫</span>
+          Cancelar Tutoría
+        </button>
+        <button class="btn-primary"
+                *ngIf="puedeReagendar(seleccionada)"
+                (click)="reagendarTutoria(seleccionada)">
+          <span>🔄</span>
+          Reagendar
+        </button>
+      </div>
+    </div>
   </div>
 </div>
