@@ -50,6 +50,13 @@ export const routes: Routes = [
   component: ReporteEstudianteComponent,
   canActivate: [authGuard]
   },
+  {
+  path: 'tutorias/editar/:id',
+  loadComponent: () =>
+    import('./features/tutorias/editar-tutoria/editar-tutoria.component')
+      .then(m => m.EditarTutoriaComponent),
+  canActivate: [authGuard]
+},
 
   { path: '**', redirectTo: 'login' }
 ];

@@ -136,4 +136,25 @@ export class TutoriaService {
     // Cuando tengas backend:
     // return this.http.delete(`${this.apiUrl}/tutorias/${id}`);
   }
+  /**
+ * Obtener tutoría por ID (precargar formulario)
+ */
+getTutoriaById(id: number): Observable<any> {
+  console.log('📥 Cargando tutoría:', id);
+
+  // MOCK
+  return of({
+    id,
+    estudiante: 'María García',
+    fecha: new Date(),
+    materia: 'Matemáticas',
+    tema: 'Integrales',
+    observaciones: 'Sesión productiva',
+    duracion: 60
+  }).pipe(delay(500));
+
+  // REAL:
+  // return this.http.get<any>(`${this.apiUrl}/tutorias/${id}`);
+  }
+
 }

@@ -268,4 +268,7 @@ export class HistorialComponent implements OnInit {
     this.materiaFiltro = '';
     this.tutoriasFiltradas = [...this.tutorias];
   }
+  editarTutoria(id: number) {
+  this.router.navigate(['/tutorias/editar', id]);
+  }
 }
