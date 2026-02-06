@@ -1,0 +1,49 @@
+<h2>Agendar Tutoría</h2>
+
+<form #f="ngForm" (ngSubmit)="confirmar(f)">
+
+  <label>Tutor</label>
+  <select [(ngModel)]="form.tutorId"
+          name="tutorId"
+          required
+          (change)="validarHorario()">
+    <option value="">Seleccione</option>
+    <option *ngFor="let t of tutores" [value]="t.id">
+      {{ t.nombre }} – {{ t.especialidad }}
+    </option>
+  </select>
+
+  <label>Fecha y hora</label>
+  <input type="datetime-local"
+         [(ngModel)]="form.fechaHora"
+         name="fechaHora"
+         required
+         (change)="validarHorario()" />
+
+  <label>Materia</label>
+  <input type="text"
+         [(ngModel)]="form.materia"
+         name="materia"
+         required />
+
+  <label>Tema</label>
+  <input type="text"
+         [(ngModel)]="form.tema"
+         name="tema"
+         required />
+
+  <button type="submit" [disabled]="!disponible">
+    Confirmar Agendamiento
+  </button>
+
+  <p class="success" *ngIf="success">{{ success }}</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <div *ngIf="horariosAlternativos.length">
+    <p>Horarios alternativos:</p>
+    <ul>
+      <li *ngFor="let h of horariosAlternativos">{{ h }}</li>
+    </ul>
+  </div>
+
+</form>

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
+import { FormTutoriaComponent } from './features/tutorias/registrar/form-tutoria.component';
+import { AgendarTutoriaComponent } from './features/tutorias/agendar/agendar-tutoria.component';
 
 // app.routes.ts
 export const routes: Routes = [
@@ -25,6 +27,11 @@ export const routes: Routes = [
   {
   path: 'registrar-tutoria',
   component: FormTutoriaComponent,
+  canActivate: [authGuard]
+  },
+  {
+  path: 'agendar-tutoria',
+  component: AgendarTutoriaComponent,
   canActivate: [authGuard]
   },
 
