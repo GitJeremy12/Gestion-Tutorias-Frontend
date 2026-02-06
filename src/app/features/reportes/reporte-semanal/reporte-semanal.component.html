@@ -1,0 +1,37 @@
+<h2>Reporte Semanal de Tutorías</h2>
+
+<label>Seleccionar semana</label>
+<input type="week"
+       [(ngModel)]="semana"
+       name="semana" />
+
+<button (click)="generarReporte()">Generar Reporte</button>
+
+<p class="error" *ngIf="error">{{ error }}</p>
+
+<div *ngIf="reporte">
+
+  <h3>Resumen</h3>
+  <p><strong>Total de tutorías:</strong> {{ reporte.totalTutorias }}</p>
+
+  <h4>Materias más solicitadas</h4>
+  <ul>
+    <li *ngFor="let m of reporte.materias">
+      {{ m.nombre }} – {{ m.total }}
+    </li>
+  </ul>
+
+  <h4>Tutores más activos</h4>
+  <ul>
+    <li *ngFor="let t of reporte.tutores">
+      {{ t.nombre }} – {{ t.total }}
+    </li>
+  </ul>
+
+  <button (click)="generarGraficos()">Ver Gráfico</button>
+
+  <div class="charts">
+    <canvas id="chartMaterias"></canvas>
+    <canvas id="chartTutores"></canvas>
+  </div>
+</div>
