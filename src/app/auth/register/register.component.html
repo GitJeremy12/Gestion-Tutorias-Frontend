@@ -1,0 +1,48 @@
+<h2>Registro</h2>
+
+<form [formGroup]="form" (ngSubmit)="register()">
+
+  <input placeholder="Nombre" formControlName="nombre">
+  <input placeholder="Email" formControlName="email">
+  <input type="password" placeholder="Contraseña" formControlName="password">
+
+  <select formControlName="rol">
+    <option value="">Seleccione rol</option>
+    <option value="estudiante">Estudiante</option>
+    <option value="tutor">Tutor</option>
+  </select>
+
+  <!-- ESTUDIANTE -->
+  <div *ngIf="form.value.rol === 'estudiante'">
+    <input placeholder="Matrícula" formControlName="matricula">
+    <input placeholder="Carrera" formControlName="carrera">
+   <input
+  type="number"
+  min="1"
+  max="12"
+  placeholder="Semestre"
+  formControlName="semestre">
+    <input placeholder="Teléfono" formControlName="telefono">
+  </div>
+
+  <!-- TUTOR -->
+ <div *ngIf="form.value.rol === 'tutor'">
+  <input placeholder="Especialidad" formControlName="especialidad">
+  <input placeholder="Departamento" formControlName="departamento">
+
+  <textarea
+    placeholder='Ejemplo:
+{
+  "lunes": ["14:00-16:00"],
+  "martes": ["10:00-12:00"]
+}'
+    formControlName="disponibilidad">
+  </textarea>
+</div>
+
+
+  <button type="submit">Registrar</button>
+</form>
+
+<p style="color:green" *ngIf="msg">{{ msg }}</p>
+<p style="color:red" *ngIf="error">{{ error }}</p>

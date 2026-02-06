@@ -29,25 +29,26 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    if (this.form.invalid) return;
+  if (this.form.invalid) return;
 
-    const { email, password } = this.form.value;
+  const { email, password } = this.form.value;
 
-    this.auth.login(email, password).subscribe({
-      next: res => {
-        switch (res.role) {
-          case 'tutor':
-            this.router.navigate(['/dashboard-tutor']);
-            break;
-          case 'estudiante':
-            this.router.navigate(['/dashboard-estudiante']);
-            break;
-          case 'admin':
-            this.router.navigate(['/admin']);
-            break;
-        }
-      },
-      error: err => this.error = err
-    });
-  }
+  this.auth.login(email, password).subscribe({
+    next: (res) => {
+      localStorage.setItem('token', res.token);
+
+      const payload = JSON.parse(atob(res.token.split('.')[1]));
+      const rol = payload.rol;
+
+      if (rol === 'tutor') {
+        this.router.navigate(['/registrar-tutoria']);
+      } else if (rol === 'estudiante') {
+        this.router.navigate(['/agendar-tutoria']);
+      }
+    },
+    error: err => {
+      this.error = err.error?.message || 'Error al iniciar sesión';
+    }
+  });
+ }
 }
