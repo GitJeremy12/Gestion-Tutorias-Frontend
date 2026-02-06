@@ -1,44 +1,223 @@
-<h2>Reporte Semanal de Tutorías</h2>
+<div class="reporte-container">
+  <div class="reporte-header">
+    <h2>Reporte Semanal de Tutorías</h2>
+    <p class="subtitle">Genera y analiza reportes de actividad semanal</p>
+  </div>
 
-<label>Seleccionar semana</label>
-<input type="week"
-       [(ngModel)]="semana"
-       name="semana" />
+  <!-- Selector de semana y generador -->
+  <div class="form-section">
+    <div class="week-selector">
+      <div class="form-group">
+        <label for="semana">
+          <span class="label-icon">📅</span>
+          Seleccionar Semana
+        </label>
+        <input
+          type="week"
+          id="semana"
+          [(ngModel)]="semana"
+          name="semana"
+          [max]="getMaxWeek()"
+          class="week-input"
+        />
+        <small class="hint">Selecciona la semana para generar el reporte</small>
+      </div>
 
-<button (click)="generarReporte()">Generar Reporte</button>
+      <button
+        class="btn-generate"
+        (click)="generarReporte()"
+        [disabled]="!semana || generando">
+        <span *ngIf="!generando">
+          <span class="btn-icon">📊</span>
+          Generar Reporte
+        </span>
+        <span *ngIf="generando" class="loading-content">
+          <span class="spinner"></span>
+          Generando...
+        </span>
+      </button>
+    </div>
 
-<p class="error" *ngIf="error">{{ error }}</p>
+    <!-- Mensaje de error -->
+    <p class="error-message" *ngIf="error">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </p>
+  </div>
 
-<div *ngIf="reporte">
+  <!-- Reporte generado -->
+  <div class="reporte-content" *ngIf="reporte">
 
-  <h3>Resumen</h3>
-  <p><strong>Total de tutorías:</strong> {{ reporte.totalTutorias }}</p>
+    <!-- Resumen general -->
+    <div class="summary-section">
+      <h3 class="section-title">
+        <span class="title-icon">📈</span>
+        Resumen General
+      </h3>
 
-  <h4>Materias más solicitadas</h4>
-  <ul>
-    <li *ngFor="let m of reporte.materias">
-      {{ m.nombre }} – {{ m.total }}
-    </li>
-  </ul>
+      <div class="stats-grid">
+        <div class="stat-card primary">
+          <div class="stat-icon">📚</div>
+          <div class="stat-info">
+            <span class="stat-label">Total de Tutorías</span>
+            <span class="stat-value">{{ reporte.totalTutorias }}</span>
+          </div>
+        </div>
 
-  <h4>Tutores más activos</h4>
-  <ul>
-    <li *ngFor="let t of reporte.tutores">
-      {{ t.nombre }} – {{ t.total }}
-    </li>
-  </ul>
+        <div class="stat-card success" *ngIf="reporte.completadas !== undefined">
+          <div class="stat-icon">✓</div>
+          <div class="stat-info">
+            <span class="stat-label">Completadas</span>
+            <span class="stat-value">{{ reporte.completadas }}</span>
+          </div>
+        </div>
 
-  <button (click)="generarGraficos()">Ver Gráfico</button>
+        <div class="stat-card warning" *ngIf="reporte.canceladas !== undefined">
+          <div class="stat-icon">🚫</div>
+          <div class="stat-info">
+            <span class="stat-label">Canceladas</span>
+            <span class="stat-value">{{ reporte.canceladas }}</span>
+          </div>
+        </div>
 
-  <div class="charts">
-    <canvas id="chartMaterias"></canvas>
-    <canvas id="chartTutores"></canvas>
+        <div class="stat-card info" *ngIf="reporte.horasTotales !== undefined">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-info">
+            <span class="stat-label">Horas Totales</span>
+            <span class="stat-value">{{ reporte.horasTotales }}h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Materias más solicitadas -->
+    <div class="data-section">
+      <h3 class="section-title">
+        <span class="title-icon">📖</span>
+        Materias Más Solicitadas
+      </h3>
+
+      <div class="ranking-list" *ngIf="reporte.materias && reporte.materias.length > 0; else noMaterias">
+        <div class="ranking-item" *ngFor="let m of reporte.materias; let i = index">
+          <div class="rank-badge" [class.top-three]="i < 3">
+            <span class="rank-number">{{ i + 1 }}</span>
+          </div>
+          <div class="rank-content">
+            <span class="rank-name">{{ m.nombre }}</span>
+            <div class="rank-bar">
+              <div class="rank-progress" [style.width.%]="getPercentage(m.total, reporte.totalTutorias)"></div>
+            </div>
+          </div>
+          <div class="rank-value">
+            <span class="value-number">{{ m.total }}</span>
+            <span class="value-label">tutorías</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noMaterias>
+        <div class="empty-data">
+          <p>No hay datos de materias para mostrar</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Tutores más activos -->
+    <div class="data-section">
+      <h3 class="section-title">
+        <span class="title-icon">👨‍🏫</span>
+        Tutores Más Activos
+      </h3>
+
+      <div class="ranking-list" *ngIf="reporte.tutores && reporte.tutores.length > 0; else noTutores">
+        <div class="ranking-item" *ngFor="let t of reporte.tutores; let i = index">
+          <div class="rank-badge" [class.top-three]="i < 3">
+            <span class="rank-number">{{ i + 1 }}</span>
+          </div>
+          <div class="rank-content">
+            <span class="rank-name">{{ t.nombre }}</span>
+            <div class="rank-bar">
+              <div class="rank-progress tutor" [style.width.%]="getPercentage(t.total, reporte.totalTutorias)"></div>
+            </div>
+          </div>
+          <div class="rank-value">
+            <span class="value-number">{{ t.total }}</span>
+            <span class="value-label">tutorías</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noTutores>
+        <div class="empty-data">
+          <p>No hay datos de tutores para mostrar</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-section" *ngIf="mostrarGraficos">
+      <div class="charts-header">
+        <h3 class="section-title">
+          <span class="title-icon">📊</span>
+          Visualización de Datos
+        </h3>
+        <button class="btn-toggle-charts" (click)="toggleGraficos()">
+          <span *ngIf="!graficosGenerados">Mostrar Gráficos</span>
+          <span *ngIf="graficosGenerados">Ocultar Gráficos</span>
+        </button>
+      </div>
+
+      <div class="charts-grid" *ngIf="graficosGenerados">
+        <div class="chart-container">
+          <h4>Distribución por Materias</h4>
+          <canvas id="chartMaterias"></canvas>
+        </div>
+        <div class="chart-container">
+          <h4>Actividad por Tutor</h4>
+          <canvas id="chartTutores"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de exportación -->
+    <div class="export-section">
+      <h3 class="section-title">
+        <span class="title-icon">💾</span>
+        Exportar Reporte
+      </h3>
+
+      <div class="export-buttons">
+        <button class="btn-export pdf" (click)="exportarPDF()" [disabled]="exportando">
+          <span class="export-icon">📄</span>
+          <div class="export-info">
+            <span class="export-title">Exportar PDF</span>
+            <span class="export-desc">Documento imprimible</span>
+          </div>
+        </button>
+
+        <button class="btn-export excel" (click)="exportarExcel()" [disabled]="exportando">
+          <span class="export-icon">📊</span>
+          <div class="export-info">
+            <span class="export-title">Exportar Excel</span>
+            <span class="export-desc">Hoja de cálculo</span>
+          </div>
+        </button>
+
+        <button class="btn-export csv" (click)="exportarCSV()" [disabled]="exportando" *ngIf="false">
+          <span class="export-icon">📋</span>
+          <div class="export-info">
+            <span class="export-title">Exportar CSV</span>
+            <span class="export-desc">Datos en texto</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="!reporte && !error && reporteBuscado">
+    <div class="empty-icon">📊</div>
+    <h3>No hay datos disponibles</h3>
+    <p>No se encontraron tutorías para la semana seleccionada</p>
   </div>
 </div>
-<button class="btn btn-danger" (click)="exportarPDF()">
-  Exportar PDF
-</button>
-
-<button class="btn btn-success ms-2" (click)="exportarExcel()">
-  Exportar Excel
-</button>

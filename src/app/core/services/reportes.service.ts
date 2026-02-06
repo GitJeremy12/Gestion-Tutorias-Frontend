@@ -5,6 +5,12 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReportesService {
+  exportToPDF(arg0: string, arg1: string[], reporte: (reporte: any, arg1: string) => void, arg3: string) {
+    throw new Error('Method not implemented.');
+  }
+  exportToExcel(reporte: (reporte: any, arg1: string) => void, arg1: string) {
+    throw new Error('Method not implemented.');
+  }
 
   private API = environment.apiUrl;
 

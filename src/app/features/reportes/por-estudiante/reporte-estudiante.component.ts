@@ -11,6 +11,28 @@ import { ReportesService } from '../../../core/services/reportes.service';
   styleUrls: ['./reporte-estudiante.component.css']
 })
 export class ReporteEstudianteComponent implements OnInit {
+limpiarFiltros() {
+throw new Error('Method not implemented.');
+}
+getMaxDate() {
+throw new Error('Method not implemented.');
+}
+estudianteSeleccionado: any;
+esError: any;
+generando: any;
+getTutoresUnicos() {
+throw new Error('Method not implemented.');
+}
+getHorasTotales() {
+throw new Error('Method not implemented.');
+}
+getMateriasUnicas() {
+throw new Error('Method not implemented.');
+}
+exportando: any;
+exportarCSV() {
+throw new Error('Method not implemented.');
+}
 
   estudiantes: any[] = [];
   tutorias: any[] = [];
@@ -20,6 +42,7 @@ export class ReporteEstudianteComponent implements OnInit {
   hasta = '';
 
   mensaje = '';
+reporteGenerado: any;
 
   constructor(private reportesService: ReportesService) {}
 
@@ -57,7 +80,7 @@ export class ReporteEstudianteComponent implements OnInit {
       });
   }
   exportarPDF() {
-  this.exportService.exportToPDF(
+  this.reportesService.exportToPDF(
     'Reporte de Tutorías por Estudiante',
     ['fecha', 'materia', 'tutor', 'observaciones'],
     this.reporte,
@@ -66,9 +89,12 @@ export class ReporteEstudianteComponent implements OnInit {
 }
 
 exportarExcel() {
-  this.exportService.exportToExcel(
+  this.reportesService.exportToExcel(
     this.reporte,
     'reporte-estudiante'
   );
 }
+  reporte(reporte: any, arg1: string) {
+    throw new Error('Method not implemented.');
+  }
 }

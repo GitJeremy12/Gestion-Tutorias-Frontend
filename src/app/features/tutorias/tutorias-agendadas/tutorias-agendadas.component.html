@@ -1,33 +1,197 @@
-<h2>Mis tutorías agendadas</h2>
+<div class="agendadas-container">
+  <div class="agendadas-header">
+    <h2>Mis Tutorías Agendadas</h2>
+    <p class="subtitle">Gestiona tus próximas sesiones de tutoría</p>
+  </div>
 
-<table class="table table-striped" *ngIf="tutorias.length">
-  <tr>
-    <th>Fecha</th>
-    <th>Materia</th>
-    <th>Estado</th>
-    <th></th>
-  </tr>
+  <!-- Filtros y acciones rápidas -->
+  <div class="actions-bar" *ngIf="tutorias.length > 0">
+    <div class="stats-summary">
+      <div class="stat-item">
+        <span class="stat-number">{{ tutorias.length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getTutoriasProximas() }}</span>
+        <span class="stat-label">Próximas 7 días</span>
+      </div>
+    </div>
+    <button class="btn-new" routerLink="/agendar">
+      <span>➕</span>
+      Nueva Tutoría
+    </button>
+  </div>
 
-  <tr *ngFor="let t of tutorias">
-    <td>{{ t.fecha | date:'short' }}</td>
-    <td>{{ t.materia }}</td>
-    <td>{{ t.estado }}</td>
-    <td>
-      <button
-        class="btn btn-danger btn-sm"
-        *ngIf="t.estado === 'agendada'"
-        (click)="abrirModal(t)">
-        Cancelar
+  <!-- Tabla de tutorías -->
+  <div class="table-container" *ngIf="tutorias.length > 0; else noTutorias">
+    <div class="table-wrapper">
+      <table class="tutorias-table">
+        <thead>
+          <tr>
+            <th>Fecha y Hora</th>
+            <th>Materia</th>
+            <th>Tema</th>
+            <th>Tutor</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of tutorias; let i = index"
+              [class.row-even]="i % 2 === 0"
+              [class.row-proxima]="esProxima(t)">
+            <td data-label="Fecha y Hora">
+              <div class="date-cell">
+                <span class="date-icon">📅</span>
+                <div class="date-info">
+                  <span class="date-day">{{ t.fecha | date:'dd/MM/yyyy' }}</span>
+                  <span class="date-time">{{ t.fecha | date:'HH:mm' }}</span>
+                  <span class="time-remaining" *ngIf="getTiempoRestante(t)">
+                    {{ getTiempoRestante(t) }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td data-label="Materia">
+              <span class="materia-badge">{{ t.materia }}</span>
+            </td>
+            <td data-label="Tema">
+              <span class="tema-text">{{ t.tema || 'Sin tema específico' }}</span>
+            </td>
+            <td data-label="Tutor">
+              <div class="tutor-cell">
+                <span class="tutor-icon">👨‍🏫</span>
+                <span class="tutor-name">{{ t.tutor?.nombre || 'N/A' }}</span>
+              </div>
+            </td>
+            <td data-label="Estado">
+              <span class="status-badge" [ngClass]="getEstadoClass(t.estado)">
+                {{ getEstadoTexto(t.estado) }}
+              </span>
+            </td>
+            <td data-label="Acciones">
+              <div class="action-buttons">
+                <button class="btn-action btn-detail" (click)="verDetalle(t)" title="Ver detalles">
+                  <span>👁️</span>
+                </button>
+                <button
+                  class="btn-action btn-cancel"
+                  *ngIf="t.estado === 'agendada'"
+                  (click)="abrirModal(t)"
+                  title="Cancelar tutoría">
+                  <span>🚫</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <ng-template #noTutorias>
+    <div class="empty-state">
+      <div class="empty-icon">📚</div>
+      <h3>No tienes tutorías agendadas</h3>
+      <p>Agenda tu primera tutoría para comenzar</p>
+      <button class="btn-primary" routerLink="/agendar">
+        <span>➕</span>
+        Agendar Tutoría
       </button>
-    </td>
-  </tr>
-</table>
+    </div>
+  </ng-template>
 
-<p *ngIf="!tutorias.length">No tienes tutorías agendadas</p>
+  <!-- Modal de cancelación -->
+  <app-cancel-modal
+    *ngIf="selectedTutoria"
+    [tutoria]="selectedTutoria"
+    (cancelada)="onCancelada()"
+    (cerrar)="selectedTutoria = null">
+  </app-cancel-modal>
 
-<app-cancel-modal
-  *ngIf="selectedTutoria"
-  [tutoria]="selectedTutoria"
-  (cancelada)="onCancelada()"
-  (cerrar)="selectedTutoria = null">
-</app-cancel-modal>
+  <!-- Modal de detalle (opcional) -->
+  <div class="modal-overlay" *ngIf="tutoriaDetalle" (click)="cerrarDetalle()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Detalle de Tutoría</h3>
+        <button class="btn-close" (click)="cerrarDetalle()">
+          <span>✕</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4>Información General</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-icon">📅</span>
+              <div class="detail-content">
+                <span class="detail-label">Fecha</span>
+                <span class="detail-value">{{ tutoriaDetalle.fecha | date:'fullDate':'':'es-ES' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">🕐</span>
+              <div class="detail-content">
+                <span class="detail-label">Hora</span>
+                <span class="detail-value">{{ tutoriaDetalle.fecha | date:'HH:mm' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-icon">👨‍🏫</span>
+              <div class="detail-content">
+                <span class="detail-label">Tutor</span>
+                <span class="detail-value">{{ tutoriaDetalle.tutor?.nombre || 'No disponible' }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item" *ngIf="tutoriaDetalle.tutor?.especialidad">
+              <span class="detail-icon">🎓</span>
+              <div class="detail-content">
+                <span class="detail-label">Especialidad</span>
+                <span class="detail-value">{{ tutoriaDetalle.tutor.especialidad }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Detalles Académicos</h4>
+          <div class="detail-grid">
+            <div class="detail-item full-width">
+              <span class="detail-icon">📚</span>
+              <div class="detail-content">
+                <span class="detail-label">Materia</span>
+                <span class="detail-value">{{ tutoriaDetalle.materia }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item full-width" *ngIf="tutoriaDetalle.tema">
+              <span class="detail-icon">📖</span>
+              <div class="detail-content">
+                <span class="detail-label">Tema</span>
+                <span class="detail-value">{{ tutoriaDetalle.tema }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarDetalle()">
+          Cerrar
+        </button>
+        <button
+          class="btn-danger"
+          *ngIf="tutoriaDetalle.estado === 'agendada'"
+          (click)="abrirModal(tutoriaDetalle)">
+          <span>🚫</span>
+          Cancelar Tutoría
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
