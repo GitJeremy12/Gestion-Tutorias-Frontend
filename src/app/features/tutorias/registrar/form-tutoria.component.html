@@ -1,0 +1,48 @@
+<h2>Registrar Tutoría</h2>
+
+<form #f="ngForm" (ngSubmit)="guardar(f)">
+
+  <label>Estudiante</label>
+  <select [(ngModel)]="form.estudianteId" name="estudianteId" required>
+    <option value="">Seleccione</option>
+    <option *ngFor="let e of estudiantes" [value]="e.id">
+      {{ e.nombre }}
+    </option>
+  </select>
+
+  <label>Fecha y hora</label>
+  <input type="datetime-local"
+         [(ngModel)]="form.fechaHora"
+         name="fechaHora"
+         required />
+
+  <label>Materia</label>
+  <input type="text"
+         [(ngModel)]="form.materia"
+         name="materia"
+         required />
+  <small class="error" *ngIf="!form.materia && error">
+    La materia es obligatoria
+  </small>
+
+  <label>Tema</label>
+  <input type="text"
+         [(ngModel)]="form.tema"
+         name="tema" />
+
+  <label>Observaciones</label>
+  <textarea [(ngModel)]="form.observaciones" name="observaciones"></textarea>
+
+  <label>Duración (min)</label>
+  <input type="number"
+         [(ngModel)]="form.duracion"
+         name="duracion"
+         min="1"
+         required />
+
+  <button type="submit">Guardar</button>
+
+  <p class="success" *ngIf="success">{{ success }}</p>
+  <p class="error" *ngIf="error && !success">{{ error }}</p>
+
+</form>

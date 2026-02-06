@@ -22,6 +22,11 @@ export const routes: Routes = [
     component: DashboardAdminComponent,
     canActivate: [authGuard]
   },
+  {
+  path: 'registrar-tutoria',
+  component: FormTutoriaComponent,
+  canActivate: [authGuard]
+  },
 
   { path: '**', redirectTo: 'login' }
 ];
