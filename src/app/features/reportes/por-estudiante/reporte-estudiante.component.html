@@ -1,0 +1,43 @@
+<h2>Reporte por Estudiante</h2>
+
+<div class="filtros">
+
+  <label>Estudiante</label>
+  <select [(ngModel)]="estudianteId">
+    <option value="">Seleccione</option>
+    <option *ngFor="let e of estudiantes" [value]="e.id">
+      {{ e.nombre }}
+    </option>
+  </select>
+
+  <label>Desde</label>
+  <input type="date" [(ngModel)]="desde" />
+
+  <label>Hasta</label>
+  <input type="date" [(ngModel)]="hasta" />
+
+  <button (click)="generar()">Generar Reporte</button>
+
+</div>
+
+<p class="mensaje" *ngIf="mensaje">{{ mensaje }}</p>
+
+<table *ngIf="tutorias.length">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Materia</th>
+      <th>Tutor</th>
+      <th>Observaciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let t of tutorias">
+      <td>{{ t.fechaHora | date:'short' }}</td>
+      <td>{{ t.materia }}</td>
+      <td>{{ t.tutor?.nombre }}</td>
+      <td>{{ t.observaciones }}</td>
+    </tr>
+  </tbody>
+</table>
