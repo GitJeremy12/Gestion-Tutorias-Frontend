@@ -1,0 +1,33 @@
+<h2>Mis tutorías agendadas</h2>
+
+<table class="table table-striped" *ngIf="tutorias.length">
+  <tr>
+    <th>Fecha</th>
+    <th>Materia</th>
+    <th>Estado</th>
+    <th></th>
+  </tr>
+
+  <tr *ngFor="let t of tutorias">
+    <td>{{ t.fecha | date:'short' }}</td>
+    <td>{{ t.materia }}</td>
+    <td>{{ t.estado }}</td>
+    <td>
+      <button
+        class="btn btn-danger btn-sm"
+        *ngIf="t.estado === 'agendada'"
+        (click)="abrirModal(t)">
+        Cancelar
+      </button>
+    </td>
+  </tr>
+</table>
+
+<p *ngIf="!tutorias.length">No tienes tutorías agendadas</p>
+
+<app-cancel-modal
+  *ngIf="selectedTutoria"
+  [tutoria]="selectedTutoria"
+  (cancelada)="onCancelada()"
+  (cerrar)="selectedTutoria = null">
+</app-cancel-modal>

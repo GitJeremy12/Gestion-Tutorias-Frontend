@@ -1,0 +1,26 @@
+<div class="modal-backdrop"></div>
+
+<div class="modal">
+  <div class="modal-content">
+    <h4>Cancelar tutoría</h4>
+
+    <p>
+      ¿Estás seguro de cancelar la tutoría de
+      <strong>{{ tutoria.materia }}</strong>
+      el {{ tutoria.fecha | date:'short' }}?
+    </p>
+
+    <div class="actions">
+      <button class="btn btn-secondary" (click)="cerrar.emit()">
+        Volver
+      </button>
+
+      <button
+        class="btn btn-danger"
+        [disabled]="loading"
+        (click)="confirmar()">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>
