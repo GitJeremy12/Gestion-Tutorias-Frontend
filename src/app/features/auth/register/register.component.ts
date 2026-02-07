@@ -106,8 +106,15 @@ export class RegisterComponent {
     } else if (this.form.rol === 'tutor') {
       dataToSend.especialidad = this.form.especialidad.trim();
       dataToSend.departamento = this.form.departamento.trim();
-      if (this.form.disponibilidad) {
-        dataToSend.disponibilidad = this.form.disponibilidad.trim();
+
+      // ✅ Convertir disponibilidad a JSON
+      if (this.form.disponibilidad && this.form.disponibilidad.trim()) {
+        dataToSend.disponibilidad = {
+          horario: this.form.disponibilidad.trim()
+        };
+      } else {
+        // ✅ Enviar objeto vacío si no hay disponibilidad
+        dataToSend.disponibilidad = {};
       }
     }
 
