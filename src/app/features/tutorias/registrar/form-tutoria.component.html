@@ -1,80 +1,43 @@
 <div class="register-tutoria-container">
   <div class="register-header">
-    <h2>Registrar Tutoría</h2>
-    <p class="subtitle">Registra una tutoría realizada o programa una nueva</p>
+    <h2>Crear Sesión de Tutoría</h2>
+    <p class="subtitle">Crea una sesión grupal disponible para estudiantes</p>
   </div>
 
-  <form #f="ngForm" (ngSubmit)="guardar(f)">
+  <!-- Loading state -->
+  <div class="loading-state" *ngIf="cargandoPerfil">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
 
-    <!-- Información del Estudiante -->
-    <div class="form-section">
-      <h3 class="section-title">Estudiante</h3>
-
-      <div class="form-group">
-        <label for="estudianteId">Selecciona el estudiante</label>
-        <select
-          [(ngModel)]="form.estudianteId"
-          id="estudianteId"
-          name="estudianteId"
-          required
-          (change)="onEstudianteChange()">
-          <option value="" disabled>Selecciona un estudiante</option>
-          <option *ngFor="let e of estudiantes" [value]="e.id">
-            👨‍🎓 {{ e.nombre }} - {{ e.carrera || 'Sin carrera' }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Info del estudiante seleccionado -->
-      <div class="estudiante-info" *ngIf="estudianteSeleccionado">
-        <div class="info-card">
-          <span class="info-icon">📚</span>
-          <div class="info-content">
-            <span class="info-label">Carrera</span>
-            <span class="info-value">{{ estudianteSeleccionado.carrera || 'No especificada' }}</span>
-          </div>
-        </div>
-        <div class="info-card" *ngIf="estudianteSeleccionado.semestre">
-          <span class="info-icon">📖</span>
-          <div class="info-content">
-            <span class="info-label">Semestre</span>
-            <span class="info-value">{{ estudianteSeleccionado.semestre }}°</span>
-          </div>
-        </div>
-        <div class="info-card" *ngIf="estudianteSeleccionado.email">
-          <span class="info-icon">📧</span>
-          <div class="info-content">
-            <span class="info-label">Email</span>
-            <span class="info-value">{{ estudianteSeleccionado.email }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <form #f="ngForm" (ngSubmit)="guardar(f)" *ngIf="!cargandoPerfil">
 
     <!-- Fecha y Hora -->
     <div class="form-section">
-      <h3 class="section-title">Fecha y Hora</h3>
+      <h3 class="section-title">📅 Fecha y Hora</h3>
 
       <div class="form-group">
-        <label for="fechaHora">Selecciona fecha y hora de la tutoría</label>
+        <label for="fechaHora">Fecha y hora de la sesión *</label>
         <input
           type="datetime-local"
           id="fechaHora"
           [(ngModel)]="form.fechaHora"
           name="fechaHora"
           required
+          [min]="getMinDateTime()"
           [max]="getMaxDateTime()"
+          (focus)="limpiarMensajes()"
         />
-        <small class="hint">Puedes registrar tutorías pasadas o futuras</small>
+        <small class="hint">Selecciona cuándo se realizará la tutoría</small>
       </div>
     </div>
 
     <!-- Detalles Académicos -->
     <div class="form-section">
-      <h3 class="section-title">Detalles Académicos</h3>
+      <h3 class="section-title">📚 Detalles Académicos</h3>
 
       <div class="form-group">
-        <label for="materia">Materia</label>
+        <label for="materia">Materia *</label>
         <input
           type="text"
           id="materia"
@@ -84,6 +47,7 @@
           placeholder="Ej: Cálculo Diferencial"
           required
           autocomplete="off"
+          (focus)="limpiarMensajes()"
         />
         <small class="error-hint" *ngIf="materiaField.invalid && (materiaField.dirty || materiaField.touched)">
           ⚠️ La materia es obligatoria
@@ -91,51 +55,112 @@
       </div>
 
       <div class="form-group">
-        <label for="tema">Tema tratado</label>
+        <label for="tema">Tema *</label>
         <input
           type="text"
           id="tema"
           [(ngModel)]="form.tema"
           name="tema"
+          #temaField="ngModel"
           placeholder="Ej: Derivadas parciales"
-          autocomplete="off"
-        />
-        <small class="hint">Opcional: Describe el tema específico abordado</small>
-      </div>
-
-      <div class="form-group">
-        <label for="duracion">Duración (minutos)</label>
-        <input
-          type="number"
-          id="duracion"
-          [(ngModel)]="form.duracion"
-          name="duracion"
-          #duracionField="ngModel"
-          min="15"
-          max="300"
-          step="15"
-          placeholder="60"
           required
+          autocomplete="off"
+          (focus)="limpiarMensajes()"
         />
-        <small class="hint">Duración típica: 60 minutos</small>
-        <small class="error-hint" *ngIf="duracionField.invalid && (duracionField.dirty || duracionField.touched)">
-          ⚠️ La duración debe estar entre 15 y 300 minutos
+        <small class="error-hint" *ngIf="temaField.invalid && (temaField.dirty || temaField.touched)">
+          ⚠️ El tema es obligatorio
         </small>
       </div>
 
       <div class="form-group">
-        <label for="observaciones">Observaciones</label>
+        <label for="descripcion">Descripción</label>
         <textarea
-          id="observaciones"
-          [(ngModel)]="form.observaciones"
-          name="observaciones"
+          id="descripcion"
+          [(ngModel)]="form.descripcion"
+          name="descripcion"
           rows="4"
-          placeholder="Escribe observaciones sobre la tutoría, temas pendientes, material necesario, etc."></textarea>
-        <small class="hint">Opcional: Notas adicionales sobre la sesión</small>
+          placeholder="Describe qué se verá en la sesión, material necesario, etc."
+          (focus)="limpiarMensajes()"></textarea>
+        <small class="hint">Opcional: Información adicional para los estudiantes</small>
       </div>
     </div>
 
-    <!-- Mensajes de éxito/error -->
+    <!-- Configuración de la Sesión -->
+    <div class="form-section">
+      <h3 class="section-title">⚙️ Configuración</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="duracion">Duración (minutos) *</label>
+          <input
+            type="number"
+            id="duracion"
+            [(ngModel)]="form.duracion"
+            name="duracion"
+            #duracionField="ngModel"
+            min="15"
+            max="300"
+            step="15"
+            required
+            (focus)="limpiarMensajes()"
+          />
+          <small class="hint">Entre 15 y 300 minutos</small>
+        </div>
+
+        <div class="form-group">
+          <label for="cupoMaximo">Cupo máximo *</label>
+          <input
+            type="number"
+            id="cupoMaximo"
+            [(ngModel)]="form.cupoMaximo"
+            name="cupoMaximo"
+            min="1"
+            max="50"
+            required
+            (focus)="limpiarMensajes()"
+          />
+          <small class="hint">Número máximo de estudiantes</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="modalidad">Modalidad *</label>
+        <select
+          [(ngModel)]="form.modalidad"
+          id="modalidad"
+          name="modalidad"
+          required
+          (change)="limpiarMensajes()">
+          <option value="presencial">🏫 Presencial</option>
+          <option value="virtual">💻 Virtual</option>
+          <option value="hibrida">🔄 Híbrida</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="ubicacion">
+          Ubicación
+          <span class="help-text" *ngIf="form.modalidad === 'presencial'">
+            (Salón o edificio)
+          </span>
+          <span class="help-text" *ngIf="form.modalidad === 'virtual'">
+            (Enlace de videoconferencia)
+          </span>
+        </label>
+        <input
+          type="text"
+          id="ubicacion"
+          [(ngModel)]="form.ubicacion"
+          name="ubicacion"
+          [placeholder]="form.modalidad === 'virtual'
+            ? 'Ej: https://meet.google.com/xxx-yyyy-zzz'
+            : 'Ej: Aula 301, Edificio A'"
+          (focus)="limpiarMensajes()"
+        />
+      </div>
+    </div>
+
+    <!-- Mensajes -->
     <p class="success" *ngIf="success">
       <span class="success-icon">✓</span>
       {{ success }}
@@ -145,16 +170,16 @@
       {{ error }}
     </p>
 
-    <!-- Botones de acción -->
+    <!-- Botones -->
     <div class="form-actions">
       <button type="button" class="btn-cancel" (click)="cancelar()">
         Cancelar
       </button>
       <button type="submit" class="btn-submit" [disabled]="!f.form.valid || guardando">
-        <span *ngIf="!guardando">Guardar Tutoría</span>
+        <span *ngIf="!guardando">✓ Crear Sesión</span>
         <span *ngIf="guardando">
           <span class="spinner-small"></span>
-          Guardando...
+          Creando...
         </span>
       </button>
     </div>

@@ -1,15 +1,140 @@
-<h2>Dashboard Tutor</h2>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1>Panel del Tutor</h1>
+        <p class="subtitle">Bienvenido, {{ nombreUsuario }}</p>
+      </div>
+      <div class="user-info">
+        <div class="user-avatar tutor">
+          <span class="avatar-icon">👨‍🏫</span>
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ nombreUsuario }}</span>
+          <span class="user-role">Tutor</span>
+          <span class="user-extra" *ngIf="especialidad">{{ especialidad }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="cards">
-  <a routerLink="/registrar-tutoria" class="card">
-    📝 Registrar Tutoría
-  </a>
+  <!-- Estadísticas del tutor -->
+  <div class="stats-section">
+    <div class="stat-card primary">
+      <div class="stat-icon">📚</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ tutoriasImpartidas }}</span>
+        <span class="stat-label">Tutorías Impartidas</span>
+      </div>
+    </div>
+    <div class="stat-card success">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ estudiantesAtendidos }}</span>
+        <span class="stat-label">Estudiantes</span>
+      </div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-icon">📅</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ tutoriasHoy }}</span>
+        <span class="stat-label">Hoy</span>
+      </div>
+    </div>
+    <div class="stat-card info">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ horasImpartidas }}</span>
+        <span class="stat-label">Horas</span>
+      </div>
+    </div>
+  </div>
 
-  <a routerLink="/historial" class="card">
-    📊 Mi Historial
-  </a>
+  <!-- Menú principal -->
+  <div class="menu-section">
+    <h2 class="section-title">
+      <span class="title-icon">🎯</span>
+      Gestión de Tutorías
+    </h2>
 
-  <a routerLink="/reporte-estudiante" class="card">
-    📄 Reporte por Estudiante
-  </a>
+    <div class="cards-grid">
+      <a routerLink="/registrar-tutoria" class="menu-card featured">
+        <div class="card-icon">📝</div>
+        <div class="card-content">
+          <h3 class="card-title">Registrar Tutoría</h3>
+          <p class="card-description">Registra una nueva sesión realizada</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/tutorias-agendadas" class="menu-card">
+        <div class="card-icon">📋</div>
+        <div class="card-content">
+          <h3 class="card-title">Tutorías Agendadas</h3>
+          <p class="card-description">Revisa tu agenda de sesiones</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/historial" class="menu-card">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+          <h3 class="card-title">Mi Historial</h3>
+          <p class="card-description">Consulta todas tus tutorías impartidas</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/reporte-estudiante" class="menu-card">
+        <div class="card-icon">📄</div>
+        <div class="card-content">
+          <h3 class="card-title">Reporte por Estudiante</h3>
+          <p class="card-description">Consulta el progreso de tus estudiantes</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/reporte-semanal" class="menu-card">
+        <div class="card-icon">📈</div>
+        <div class="card-content">
+          <h3 class="card-title">Reporte Semanal</h3>
+          <p class="card-description">Estadísticas de tu actividad semanal</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/perfil" class="menu-card">
+        <div class="card-icon">⚙️</div>
+        <div class="card-content">
+          <h3 class="card-title">Mi Perfil</h3>
+          <p class="card-description">Actualiza tu disponibilidad y datos</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Agenda del día -->
+  <div class="agenda-section" *ngIf="agendaHoy.length > 0">
+    <h2 class="section-title">
+      <span class="title-icon">📆</span>
+      Agenda de Hoy
+    </h2>
+
+    <div class="agenda-list">
+      <div class="agenda-item" *ngFor="let tutoria of agendaHoy">
+        <div class="agenda-time">
+          <span class="time-hour">{{ tutoria.hora }}</span>
+        </div>
+        <div class="agenda-content">
+          <h4 class="agenda-materia">{{ tutoria.materia }}</h4>
+          <p class="agenda-estudiante">👨‍🎓 {{ tutoria.estudiante }}</p>
+          <span class="agenda-tema">{{ tutoria.tema }}</span>
+        </div>
+        <div class="agenda-status" [class]="tutoria.estado">
+          {{ tutoria.estado }}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

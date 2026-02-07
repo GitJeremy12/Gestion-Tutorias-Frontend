@@ -1,8 +1,10 @@
+// form-tutoria.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TutoriaService } from '../../../core/services/tutoria.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   standalone: true,
@@ -12,44 +14,63 @@ import { TutoriaService } from '../../../core/services/tutoria.service';
   styleUrls: ['./form-tutoria.component.css']
 })
 export class FormTutoriaComponent implements OnInit {
-  estudiantes: any[] = [];
-  estudianteSeleccionado: any = null;
+  tutorId: number = 0;
 
   form = {
-    estudianteId: '',
     fechaHora: '',
     materia: '',
     tema: '',
-    observaciones: '',
-    duracion: 60
+    descripcion: '',
+    duracion: 60,
+    cupoMaximo: 10,
+    modalidad: 'presencial' as 'presencial' | 'virtual' | 'hibrida',
+    ubicacion: ''
   };
 
   error = '';
   success = '';
   guardando = false;
+  cargandoPerfil = true;
 
   constructor(
     private tutoriaService: TutoriaService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit() {
-    this.cargarEstudiantes();
+    this.cargarPerfilTutor();
     this.setDefaultDateTime();
   }
 
-  cargarEstudiantes() {
-    this.tutoriaService.getEstudiantes().subscribe({
-      next: data => {
-        this.estudiantes = data;
+  cargarPerfilTutor() {
+    this.cargandoPerfil = true;
+
+    this.authService.getProfile().subscribe({
+      next: (res: any) => {
+        if (res.user.rol !== 'tutor') {
+          this.error = 'Solo los tutores pueden registrar tutorías';
+          this.cargandoPerfil = false;
+          return;
+        }
+
+        this.tutorId = res.profile?.id;
+
+        if (!this.tutorId) {
+          this.error = 'No se pudo obtener el ID del tutor';
+          this.cargandoPerfil = false;
+          return;
+        }
+
+        this.cargandoPerfil = false;
       },
-      error: () => {
-        this.error = 'Error al cargar la lista de estudiantes';
+      error: (err) => {
+        this.error = 'Error al cargar datos del tutor';
+        this.cargandoPerfil = false;
       }
     });
   }
 
-  // Establecer fecha y hora actual por defecto
   setDefaultDateTime() {
     const now = new Date();
     const year = now.getFullYear();
@@ -61,7 +82,17 @@ export class FormTutoriaComponent implements OnInit {
     this.form.fechaHora = `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
-  // Obtener fecha máxima permitida (1 año adelante)
+  getMinDateTime(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
   getMaxDateTime(): string {
     const future = new Date();
     future.setFullYear(future.getFullYear() + 1);
@@ -73,21 +104,22 @@ export class FormTutoriaComponent implements OnInit {
     return `${year}-${month}-${day}T23:59`;
   }
 
-  // Cuando cambia el estudiante seleccionado
-  onEstudianteChange() {
-    this.estudianteSeleccionado = this.estudiantes.find(
-      e => e.id === +this.form.estudianteId
-    ) || null;
-  }
-
-  // Guardar tutoría
   guardar(formRef: any) {
     this.error = '';
     this.success = '';
 
-    // Validaciones
+    if (!this.tutorId) {
+      this.error = 'No se pudo identificar al tutor. Recarga la página.';
+      return;
+    }
+
     if (!this.form.materia || !this.form.materia.trim()) {
       this.error = 'La materia es obligatoria';
+      return;
+    }
+
+    if (!this.form.tema || !this.form.tema.trim()) {
+      this.error = 'El tema es obligatorio';
       return;
     }
 
@@ -101,11 +133,6 @@ export class FormTutoriaComponent implements OnInit {
       return;
     }
 
-    if (!this.form.estudianteId) {
-      this.error = 'Debes seleccionar un estudiante';
-      return;
-    }
-
     if (!this.form.fechaHora) {
       this.error = 'Debes seleccionar fecha y hora';
       return;
@@ -113,40 +140,43 @@ export class FormTutoriaComponent implements OnInit {
 
     this.guardando = true;
 
-    this.tutoriaService.registrarTutoria(this.form).subscribe({
+    const datosParaBackend = {
+      tutorId: this.tutorId,
+      fecha: this.form.fechaHora,
+      materia: this.form.materia.trim(),
+      tema: this.form.tema.trim(),
+      descripcion: this.form.descripcion?.trim() || undefined,
+      duracion: Number(this.form.duracion),
+      cupoMaximo: Number(this.form.cupoMaximo),
+      modalidad: this.form.modalidad,
+      ubicacion: this.form.ubicacion?.trim() || undefined
+    };
+
+    console.log('📤 Enviando al backend:', datosParaBackend);
+
+    this.tutoriaService.registrarTutoria(datosParaBackend).subscribe({
       next: (response) => {
-        this.success = '✓ Tutoría registrada exitosamente';
+        console.log('✅ Tutoría creada:', response);
+        this.success = '✓ Sesión grupal creada exitosamente. Los estudiantes podrán inscribirse.';
         this.guardando = false;
 
-        // Resetear formulario después de 2 segundos
         setTimeout(() => {
-          formRef.resetForm();
-          this.estudianteSeleccionado = null;
-          this.form.duracion = 60;
-          this.setDefaultDateTime();
-          this.success = '';
-
-          // Opcional: redirigir al historial
-          // this.router.navigate(['/historial']);
+          this.router.navigate(['/historial']);
         }, 2000);
       },
       error: err => {
-        this.error = err.error?.message || 'Error al registrar la tutoría. Intenta nuevamente.';
+        console.error('❌ Error:', err);
+        this.error = err.error?.message || 'Error al registrar la tutoría';
         this.guardando = false;
-        console.error('Error al guardar:', err);
       }
     });
   }
 
-  // Cancelar y volver
   cancelar() {
-    const hayDatos = this.form.estudianteId ||
-                     this.form.materia ||
-                     this.form.tema ||
-                     this.form.observaciones;
+    const hayDatos = this.form.materia || this.form.tema || this.form.descripcion;
 
     if (hayDatos) {
-      if (confirm('¿Estás seguro de que deseas cancelar? Se perderán los datos ingresados.')) {
+      if (confirm('¿Deseas cancelar? Se perderán los datos ingresados.')) {
         this.router.navigate(['/historial']);
       }
     } else {
@@ -154,7 +184,6 @@ export class FormTutoriaComponent implements OnInit {
     }
   }
 
-  // Limpiar mensajes
   limpiarMensajes() {
     this.error = '';
     this.success = '';

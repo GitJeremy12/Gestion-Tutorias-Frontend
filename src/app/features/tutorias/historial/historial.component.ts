@@ -1,24 +1,30 @@
+// historial.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { HistorialService } from '../../../core/services/historial.service';
 
 @Component({
-  standalone: true,
   selector: 'app-historial',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './historial.component.html',
   styleUrls: ['./historial.component.css']
 })
 export class HistorialComponent implements OnInit {
+  // Datos
   tutorias: any[] = [];
   tutoriasFiltradas: any[] = [];
-  materias: string[] = [];
-  materiaFiltro = '';
   seleccionada: any = null;
+
+  // Estado
   loading = false;
   error = '';
+
+  // Filtros
+  materiaFiltro = '';
+  materias: string[] = [];
 
   constructor(
     private historialService: HistorialService,
@@ -29,157 +35,131 @@ export class HistorialComponent implements OnInit {
     this.cargarHistorial();
   }
 
+  /**
+   * Cargar todas las tutorías del historial
+   */
   cargarHistorial() {
     this.loading = true;
     this.error = '';
 
     this.historialService.getHistorial().subscribe({
-      next: data => {
-        // Orden descendente por fecha
-        this.tutorias = data.sort(
-          (a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime()
-        );
-        this.tutoriasFiltradas = [...this.tutorias];
-
-        // Extraer materias únicas y ordenarlas alfabéticamente
-        this.materias = [...new Set(this.tutorias.map(t => t.materia))].sort();
-
+      next: (tutorias) => {
+        console.log('✅ Tutorías cargadas:', tutorias);
+        this.tutorias = tutorias;
+        this.tutoriasFiltradas = tutorias;
+        this.extraerMaterias();
         this.loading = false;
       },
-      error: err => {
-        this.error = 'Error al cargar el historial de tutorías';
+      error: (err) => {
+        console.error('❌ Error al cargar historial:', err);
+        this.error = err.error?.message || 'Error al cargar el historial';
         this.loading = false;
-        console.error('Error:', err);
       }
     });
   }
 
+  /**
+   * Extraer lista única de materias
+   */
+  extraerMaterias() {
+    const materiasSet = new Set<string>();
+    this.tutorias.forEach(t => {
+      if (t.materia) {
+        materiasSet.add(t.materia);
+      }
+    });
+    this.materias = Array.from(materiasSet).sort();
+  }
+
+  /**
+   * Filtrar por materia
+   */
   filtrarPorMateria() {
     if (!this.materiaFiltro) {
       this.tutoriasFiltradas = [...this.tutorias];
       return;
     }
-    this.tutoriasFiltradas = this.tutorias.filter(
-      t => t.materia === this.materiaFiltro
-    );
+
+    this.loading = true;
+
+    this.historialService.getTutoriasPorMateria(this.materiaFiltro).subscribe({
+      next: (tutorias) => {
+        this.tutoriasFiltradas = tutorias;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error al filtrar:', err);
+        // Filtrar localmente si falla el backend
+        this.tutoriasFiltradas = this.tutorias.filter(
+          t => t.materia === this.materiaFiltro
+        );
+        this.loading = false;
+      }
+    });
   }
 
+  /**
+   * Limpiar filtros
+   */
+  limpiarFiltros() {
+    this.materiaFiltro = '';
+    this.tutoriasFiltradas = [...this.tutorias];
+  }
+
+  /**
+   * Ver detalle de una tutoría
+   */
   verDetalle(tutoria: any) {
+    console.log('👁️ Ver detalle:', tutoria);
     this.seleccionada = tutoria;
-    // Prevenir scroll del body cuando el modal está abierto
-    document.body.style.overflow = 'hidden';
   }
 
+  /**
+   * Cerrar modal de detalle
+   */
   cerrarDetalle() {
     this.seleccionada = null;
-    // Restaurar scroll del body
-    document.body.style.overflow = 'auto';
   }
 
-  // Método para obtener la clase CSS del estado
+  /**
+   * Obtener clase CSS según el estado
+   */
   getStatusClass(tutoria: any): string {
-    const estado = tutoria.estado?.toLowerCase() || this.determinarEstado(tutoria);
-
-    switch (estado) {
+    switch (tutoria.estado) {
+      case 'programada':
+        return 'status-scheduled';
+      case 'en_curso':
+        return 'status-in-progress';
       case 'completada':
-      case 'realizada':
-        return 'completada';
-      case 'pendiente':
-      case 'agendada':
-        return 'pendiente';
+        return 'status-completed';
       case 'cancelada':
-        return 'cancelada';
+        return 'status-cancelled';
       default:
-        return 'pendiente';
+        return 'status-unknown';
     }
   }
 
-  // Método para obtener el texto del estado
+  /**
+   * Obtener texto legible del estado
+   */
   getStatusText(tutoria: any): string {
-    const estado = tutoria.estado?.toLowerCase() || this.determinarEstado(tutoria);
-
-    switch (estado) {
+    switch (tutoria.estado) {
+      case 'programada':
+        return 'Programada';
+      case 'en_curso':
+        return 'En Curso';
       case 'completada':
-      case 'realizada':
         return 'Completada';
-      case 'pendiente':
-      case 'agendada':
-        return 'Pendiente';
       case 'cancelada':
         return 'Cancelada';
       default:
-        return this.esFutura(tutoria) ? 'Pendiente' : 'Completada';
+        return 'Desconocido';
     }
   }
 
-  // Determinar estado basado en la fecha si no viene en los datos
-  private determinarEstado(tutoria: any): string {
-    const fechaTutoria = new Date(tutoria.fechaHora);
-    const ahora = new Date();
-
-    if (fechaTutoria > ahora) {
-      return 'pendiente';
-    } else {
-      return 'completada';
-    }
-  }
-
-  // Verificar si la tutoría es futura
-  esFutura(tutoria: any): boolean {
-    const fechaTutoria = new Date(tutoria.fechaHora);
-    const ahora = new Date();
-    return fechaTutoria > ahora;
-  }
-
-  // Verificar si se puede reagendar
-  puedeReagendar(tutoria: any): boolean {
-    const estado = tutoria.estado?.toLowerCase() || this.determinarEstado(tutoria);
-
-    // Solo se puede reagendar si está pendiente o es futura
-    if (estado === 'completada' || estado === 'cancelada') {
-      return false;
-    }
-
-    return this.esFutura(tutoria);
-  }
-
-  // Reagendar tutoría
-  reagendarTutoria(tutoria: any) {
-    // Aquí podrías implementar la lógica para reagendar
-    // Por ejemplo, navegar al formulario de agendamiento con datos prellenados
-    this.cerrarDetalle();
-    this.router.navigate(['/agendar'], {
-      queryParams: {
-        reagendar: tutoria.id,
-        tutorId: tutoria.tutor?.id,
-        materia: tutoria.materia,
-        tema: tutoria.tema
-      }
-    });
-  }
-
-  // Cancelar tutoría
-  cancelarTutoria(tutoria: any) {
-    if (!confirm('¿Estás seguro de que deseas cancelar esta tutoría?')) {
-      return;
-    }
-
-    this.historialService.cancelarTutoria(tutoria.id).subscribe({
-      next: () => {
-        // Actualizar el estado local
-        tutoria.estado = 'cancelada';
-        this.cerrarDetalle();
-        // Recargar historial
-        this.cargarHistorial();
-      },
-      error: (err: any) => {
-        this.error = 'Error al cancelar la tutoría';
-        console.error('Error:', err);
-      }
-    });
-  }
-
-  // Formatear duración
+  /**
+   * Formatear duración en minutos
+   */
   formatearDuracion(minutos: number): string {
     if (!minutos) return 'No especificada';
 
@@ -194,81 +174,107 @@ export class HistorialComponent implements OnInit {
       return `${horas} ${horas === 1 ? 'hora' : 'horas'}`;
     }
 
-    return `${horas}h ${mins}m`;
+    return `${horas}h ${mins}min`;
   }
 
-  // Obtener estadísticas
-  getEstadisticas() {
-    return {
-      total: this.tutoriasFiltradas.length,
-      completadas: this.tutoriasFiltradas.filter(t =>
-        this.getStatusClass(t) === 'completada'
-      ).length,
-      pendientes: this.tutoriasFiltradas.filter(t =>
-        this.getStatusClass(t) === 'pendiente'
-      ).length,
-      canceladas: this.tutoriasFiltradas.filter(t =>
-        this.getStatusClass(t) === 'cancelada'
-      ).length,
-      materias: this.materias.length
-    };
+  /**
+   * Verificar si puede reagendar/cancelar
+   */
+  puedeReagendar(tutoria: any): boolean {
+    // Solo puede cancelar/reagendar si está programada o en curso
+    return tutoria.estado === 'programada' || tutoria.estado === 'en_curso';
   }
 
-  // Exportar historial (opcional)
+  /**
+   * Cancelar tutoría
+   */
+  cancelarTutoria(tutoria: any) {
+    if (!confirm(`¿Estás seguro de cancelar la tutoría de ${tutoria.materia}?`)) {
+      return;
+    }
+
+    this.historialService.cancelarTutoria(tutoria.id).subscribe({
+      next: () => {
+        alert('Tutoría cancelada exitosamente');
+        this.cerrarDetalle();
+        this.cargarHistorial(); // Recargar lista
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Error al cancelar la tutoría');
+      }
+    });
+  }
+
+  /**
+   * Reagendar tutoría
+   */
+  reagendarTutoria(tutoria: any) {
+    // Redirigir a la página de edición
+    this.router.navigate(['/tutorias/editar', tutoria.id]);
+  }
+
+  /**
+   * Exportar historial a CSV
+   */
   exportarHistorial() {
-    // Convertir a CSV
-    const headers = ['Fecha', 'Hora', 'Materia', 'Tema', 'Tutor', 'Estado', 'Duración'];
+    if (this.tutoriasFiltradas.length === 0) {
+      alert('No hay tutorías para exportar');
+      return;
+    }
+
+    // Crear CSV
+    const headers = ['Fecha', 'Hora', 'Materia', 'Tema', 'Tutor', 'Estudiante', 'Estado', 'Duración'];
     const rows = this.tutoriasFiltradas.map(t => [
-      new Date(t.fechaHora).toLocaleDateString('es-ES'),
-      new Date(t.fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      this.formatDate(t.fecha),
+      this.formatTime(t.fecha),
       t.materia,
       t.tema,
       t.tutor?.nombre || 'N/A',
+      t.estudiante?.nombre || 'N/A',
       this.getStatusText(t),
       this.formatearDuracion(t.duracion)
     ]);
 
-    let csv = headers.join(',') + '\n';
+    // Convertir a CSV
+    let csvContent = headers.join(',') + '\n';
     rows.forEach(row => {
-      csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+      csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
     });
 
     // Descargar archivo
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
 
     link.setAttribute('href', url);
-    link.setAttribute('download', `historial-tutorias-${new Date().getTime()}.csv`);
+    link.setAttribute('download', `historial_tutorias_${new Date().getTime()}.csv`);
     link.style.visibility = 'hidden';
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    console.log('✅ Historial exportado');
   }
 
-  // Buscar por texto (opcional, para implementar búsqueda)
-  buscarPorTexto(texto: string) {
-    if (!texto.trim()) {
-      this.filtrarPorMateria();
-      return;
-    }
-
-    const busqueda = texto.toLowerCase();
-    this.tutoriasFiltradas = this.tutorias.filter(t =>
-      t.materia.toLowerCase().includes(busqueda) ||
-      t.tema.toLowerCase().includes(busqueda) ||
-      t.tutor?.nombre.toLowerCase().includes(busqueda) ||
-      t.estudiante?.nombre.toLowerCase().includes(busqueda)
-    );
+  /**
+   * Formatear fecha para export
+   */
+  private formatDate(fecha: string): string {
+    const date = new Date(fecha);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
-  // Limpiar filtros
-  limpiarFiltros() {
-    this.materiaFiltro = '';
-    this.tutoriasFiltradas = [...this.tutorias];
-  }
-  editarTutoria(id: number) {
-  this.router.navigate(['/tutorias/editar', id]);
+  /**
+   * Formatear hora para export
+   */
+  private formatTime(fecha: string): string {
+    const date = new Date(fecha);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 }
