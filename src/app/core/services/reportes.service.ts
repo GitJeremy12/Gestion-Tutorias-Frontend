@@ -10,7 +10,7 @@ export class ReportesService {
   private apiUrl = 'http://localhost:3000/api';
 
   constructor(private http: HttpClient) {}
-
+/*
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
 
@@ -22,7 +22,7 @@ export class ReportesService {
     return new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
-  }
+  }*/
 
   // =========================
   // 📘 REPORTE ESTUDIANTE
@@ -31,7 +31,7 @@ export class ReportesService {
   getReporteEstudiante(estudianteId: number): Observable<any> {
     return this.http.get(
       `${this.apiUrl}/reportes/estudiante/${estudianteId}`,
-      { headers: this.getHeaders() }
+
     );
   }
 
@@ -41,7 +41,7 @@ export class ReportesService {
   getReporteTutor(tutorId: number): Observable<any> {
     return this.http.get(
       `${this.apiUrl}/reportes/tutor/${tutorId}`,
-      { headers: this.getHeaders() }
+
     );
   }
 
@@ -57,7 +57,7 @@ export class ReportesService {
 
     return this.http.get(
       `${this.apiUrl}/reportes/semanal`,
-      { headers: this.getHeaders(), params }
+
     );
   }
 
@@ -80,7 +80,7 @@ export class ReportesService {
     return this.http.get(
       `${this.apiUrl}/reportes/pdf`,
       {
-        headers: this.getHeaders(),
+       
         params,
         responseType: 'blob'
       }

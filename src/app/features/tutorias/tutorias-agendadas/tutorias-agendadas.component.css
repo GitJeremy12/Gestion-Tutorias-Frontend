@@ -1,366 +1,206 @@
-/* Contenedor principal */
-.agendadas-container {
+/* ========================================
+   🎨 VARIABLES DE COLOR ESPAM MFL
+======================================== */
+:root {
+  --espam-verde-principal: #2d5016;
+  --espam-verde-claro: #4a7c2c;
+  --espam-verde-hover: #3d6620;
+  --espam-blanco: #ffffff;
+  --espam-gris-claro: #f5f5f5;
+  --espam-gris-medio: #e0e0e0;
+  --espam-texto-oscuro: #333333;
+  --espam-sombra: rgba(45, 80, 22, 0.1);
+  --espam-sombra-hover: rgba(45, 80, 22, 0.2);
+}
+
+/* ========================================
+   📦 CONTENEDOR PRINCIPAL
+======================================== */
+.container {
   max-width: 1200px;
-  margin: 40px auto;
-  padding: 45px 40px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8faf7 0%, #ffffff 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Header */
-.agendadas-header {
-  text-align: center;
-  margin-bottom: 35px;
-}
-
+/* ========================================
+   📘 TÍTULO PRINCIPAL
+======================================== */
 h2 {
-  color: #2c3e50;
-  margin-bottom: 8px;
-  font-size: 28px;
+  color: var(--espam-verde-principal);
+  font-size: 2.2rem;
   font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+  padding-bottom: 1rem;
+  border-bottom: 4px solid var(--espam-verde-claro);
+  position: relative;
+  animation: fadeInDown 0.6s ease-out;
 }
 
-.subtitle {
-  color: #7f8c8d;
-  font-size: 14px;
-  margin: 0;
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: var(--espam-verde-claro);
+  border-radius: 2px;
 }
 
-/* Barra de acciones */
-.actions-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  margin-bottom: 25px;
-}
-
-.stats-summary {
-  display: flex;
-  gap: 30px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-number {
-  font-size: 28px;
-  font-weight: 700;
-  color: #667eea;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #7f8c8d;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.btn-new {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+/* ========================================
+   📄 BOTÓN DESCARGAR PDF
+======================================== */
+button {
+  background: linear-gradient(135deg, var(--espam-verde-principal) 0%, var(--espam-verde-claro) 100%);
+  color: var(--espam-blanco);
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-new:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-}
-
-/* Contenedor de tabla */
-.table-container {
-  background: #f8f9fa;
   border-radius: 12px;
-  padding: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 auto 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px var(--espam-sombra);
+  animation: fadeIn 0.8s ease-out;
 }
 
-.table-wrapper {
-  overflow-x: auto;
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--espam-verde-hover) 0%, var(--espam-verde-principal) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--espam-sombra-hover);
 }
 
-/* Tabla */
-.tutorias-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 10px;
+button:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px var(--espam-sombra);
+}
+
+button:disabled {
+  background: var(--espam-gris-medio);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+/* ========================================
+   📋 SEPARADOR
+======================================== */
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--espam-verde-claro), transparent);
+  margin: 2rem 0;
+}
+
+/* ========================================
+   🃏 TARJETAS DE TUTORÍAS
+======================================== */
+.card {
+  background: var(--espam-blanco);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px var(--espam-sombra);
+  border-left: 5px solid var(--espam-verde-principal);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease-out;
+  animation-fill-mode: both;
+  position: relative;
   overflow: hidden;
 }
 
-.tutorias-table thead {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.tutorias-table th {
-  padding: 16px;
-  text-align: left;
-  font-weight: 600;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.tutorias-table tbody tr {
-  border-bottom: 1px solid #e9ecef;
-  transition: all 0.2s ease;
-}
-
-.tutorias-table tbody tr:hover {
-  background-color: #f8f9fa;
-  transform: scale(1.01);
-}
-
-.tutorias-table tbody tr.row-even {
-  background-color: #fcfcfc;
-}
-
-.tutorias-table tbody tr.row-proxima {
-  background: linear-gradient(90deg, #fff3cd 0%, #ffffff 100%);
-  border-left: 4px solid #ffc107;
-}
-
-.tutorias-table td {
-  padding: 16px;
-  font-size: 14px;
-  color: #2c3e50;
-}
-
-/* Celdas personalizadas */
-.date-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.date-icon {
-  font-size: 24px;
-}
-
-.date-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.date-day {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.date-time {
-  font-size: 13px;
-  color: #7f8c8d;
-}
-
-.time-remaining {
-  font-size: 11px;
-  color: #e67e22;
-  font-weight: 600;
-  background: #fef5e7;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: inline-block;
-  margin-top: 2px;
-}
-
-.materia-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  background: #e3f2fd;
-  color: #1976d2;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.tema-text {
-  color: #34495e;
-  font-weight: 500;
-  font-size: 13px;
-}
-
-.tutor-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tutor-icon {
-  font-size: 20px;
-}
-
-.tutor-name {
-  font-weight: 500;
-}
-
-/* Badges de estado */
-.status-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-badge.agendada {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status-badge.confirmada {
-  background: #d1ecf1;
-  color: #0c5460;
-}
-
-.status-badge.completada {
-  background: #d5f4e6;
-  color: #27ae60;
-}
-
-.status-badge.cancelada {
-  background: #fdecea;
-  color: #e74c3c;
-}
-
-/* Botones de acción */
-.action-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.btn-action {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-detail {
-  background: #667eea;
-  color: white;
-}
-
-.btn-detail:hover {
-  background: #764ba2;
-  transform: scale(1.1);
-}
-
-.btn-cancel {
-  background: #e74c3c;
-  color: white;
-}
-
-.btn-cancel:hover {
-  background: #c0392b;
-  transform: scale(1.1);
-}
-
-/* Estado vacío */
-.empty-state {
-  text-align: center;
-  padding: 80px 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-}
-
-.empty-icon {
-  font-size: 80px;
-  margin-bottom: 20px;
-  opacity: 0.5;
-}
-
-.empty-state h3 {
-  color: #2c3e50;
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-
-.empty-state p {
-  color: #7f8c8d;
-  font-size: 15px;
-  margin-bottom: 25px;
-}
-
-.btn-primary {
-  padding: 14px 28px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
+/* Efecto de brillo al pasar el mouse */
+.card::before {
+  content: '';
+  position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 16px;
-  max-width: 600px;
+  left: -100%;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 124, 44, 0.1), transparent);
+  transition: left 0.5s ease;
 }
 
+.card:hover::before {
+  left: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px var(--espam-sombra-hover);
+  border-left-width: 8px;
+}
+
+/* Animación escalonada para múltiples tarjetas */
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
+.card:nth-child(5) { animation-delay: 0.5s; }
+
+.card p {
+  margin: 0.7rem 0;
+  color: var(--espam-texto-oscuro);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.card p strong {
+  color: var(--espam-verde-principal);
+  font-weight: 600;
+  display: inline-block;
+  min-width: 120px;
+}
+
+/* ========================================
+   ⚠️ MENSAJES DE ESTADO
+======================================== */
+/* Sin tutorías */
+ng-template p,
+.container > ng-container > p,
+p:not(.card p) {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--espam-texto-oscuro);
+  padding: 3rem;
+  background: var(--espam-gris-claro);
+  border-radius: 12px;
+  border: 2px dashed var(--espam-gris-medio);
+  margin-top: 2rem;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Mensaje de carga */
+.container > ng-template p strong {
+  color: var(--espam-verde-claro);
+  font-size: 1.3rem;
+}
+
+/* ========================================
+   🎬 ANIMACIONES
+======================================== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
   to {
     opacity: 1;
@@ -368,212 +208,110 @@ h2 {
   }
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 25px 30px;
-  border-bottom: 2px solid #e9ecef;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.modal-header h3 {
-  color: #2c3e50;
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.btn-close {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: #f8f9fa;
-  color: #7f8c8d;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-close:hover {
-  background: #e74c3c;
-  color: white;
-}
-
-.modal-body {
-  padding: 30px;
-}
-
-.detail-section {
-  margin-bottom: 25px;
-}
-
-.detail-section:last-child {
-  margin-bottom: 0;
-}
-
-.detail-section h4 {
-  color: #34495e;
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #667eea;
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-}
-
-.detail-item {
-  display: flex;
-  gap: 12px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.detail-item.full-width {
-  grid-column: 1 / -1;
-}
-
-.detail-icon {
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.detail-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.detail-label {
-  font-size: 11px;
-  color: #7f8c8d;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.detail-value {
-  font-size: 14px;
-  color: #2c3e50;
-  font-weight: 500;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 30px;
-  border-top: 2px solid #e9ecef;
-}
-
-.btn-secondary {
-  padding: 12px 24px;
-  background: #e9ecef;
-  color: #2c3e50;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background: #dee2e6;
-}
-
-.btn-danger {
-  padding: 12px 24px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-danger:hover {
-  background: #c0392b;
-}
-
-/* Responsive */
+/* ========================================
+   📱 RESPONSIVE DESIGN
+======================================== */
 @media (max-width: 768px) {
-  .agendadas-container {
-    margin: 20px;
-    padding: 30px 20px;
+  .container {
+    padding: 1rem;
   }
 
-  .actions-bar {
-    flex-direction: column;
-    gap: 20px;
+  h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
   }
 
-  .stats-summary {
-    width: 100%;
-    justify-content: space-around;
-  }
-
-  .btn-new {
+  button {
     width: 100%;
     justify-content: center;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
   }
 
-  /* Tabla responsive */
-  .tutorias-table thead {
-    display: none;
+  .card {
+    padding: 1.2rem;
+    margin-bottom: 1rem;
   }
 
-  .tutorias-table tbody tr {
+  .card p {
+    font-size: 0.95rem;
+  }
+
+  .card p strong {
     display: block;
-    margin-bottom: 15px;
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 15px;
+    margin-bottom: 0.3rem;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 1.4rem;
   }
 
-  .tutorias-table td {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #f8f9fa;
+  button {
+    font-size: 0.95rem;
+    padding: 0.8rem 1.2rem;
   }
 
-  .tutorias-table td:last-child {
-    border-bottom: none;
+  .card {
+    padding: 1rem;
   }
+}
 
-  .tutorias-table td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #7f8c8d;
-    font-size: 12px;
-    text-transform: uppercase;
-  }
+/* ========================================
+   🎯 ESTADOS ESPECIALES
+======================================== */
+/* Estado de tutoría según tipo */
+.card p:last-child strong {
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-  .date-cell,
-  .tutor-cell,
-  .action-buttons {
-    justify-content: flex-end;
-  }
+/* Puedes agregar clases dinámicas desde el TS para diferentes estados */
+.estado-activa {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
 
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
+.estado-completada {
+  background: #e3f2fd;
+  color: #1976d2;
+}
 
-  .modal-content {
-    margin: 10px;
-  }
+.estado-cancelada {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* ========================================
+   🔄 LOADER ANIMADO (OPCIONAL)
+======================================== */
+.loading-spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--espam-gris-medio);
+  border-top-color: var(--espam-verde-principal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

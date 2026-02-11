@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReportesService } from '../../../core/services/reportes.service';
-import { finalize, timeout } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, shareReplay, timeout } from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -9,37 +10,20 @@ import { finalize, timeout } from 'rxjs/operators';
   templateUrl: './tutorias-agendadas.component.html',
   imports: [CommonModule]
 })
-export class TutoriasAgendadasComponent implements OnInit {
+export class TutoriasAgendadasComponent {
 
-  reporte: any = null;
-  loading = false;
+  reporte$: Observable<any>;
 
-  constructor(private reportesService: ReportesService) {}
-
-  ngOnInit(): void {
-    this.cargarReporte();
-  }
-
-  cargarReporte(): void {
-    this.loading = true;
-
-    // 👇 OBLIGATORIO mandar 0 porque el backend lo espera
-    this.reportesService.getReporteEstudiante(0)
-      .pipe(
-        timeout(8000),                 // ⏱️ evita loading infinito
-        finalize(() => {
-          this.loading = false;        // ✅ SIEMPRE se ejecuta
-        })
-      )
-      .subscribe({
-        next: (data) => {
-          this.reporte = data;
-          console.log('Reporte recibido:', data);
-        },
-        error: (err) => {
-          console.error('Error reporte estudiante:', err);
-        }
-      });
+  constructor(private reportesService: ReportesService) {
+    // ✅ aquí ya existe reportesService
+    this.reporte$ = this.reportesService.getReporteEstudiante(0).pipe(
+      timeout(8000),
+      shareReplay(1),
+      catchError(err => {
+        console.error('Error reporte estudiante:', err);
+        return of(null);
+      })
+    );
   }
 
   descargarPDF(): void {

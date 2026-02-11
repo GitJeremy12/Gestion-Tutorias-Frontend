@@ -50,7 +50,8 @@ export const routes: Routes = [
   },
  {
     path: 'tutorias-agendadas',
-    component: TutoriasAgendadasComponent
+    component: TutoriasAgendadasComponent,
+    canActivate: [authGuard, roleGuard(['estudiante', 'admin'])]
   },
   // Agendar - solo estudiantes
   {

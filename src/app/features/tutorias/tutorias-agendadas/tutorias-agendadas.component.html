@@ -1,45 +1,39 @@
 <div class="container">
 
-  <!-- Cargando -->
-  <div *ngIf="loading">
-    <p><strong>Cargando reporte...</strong></p>
-  </div>
+  <h2>📘 Mis tutorías agendadas</h2>
 
-  <!-- Contenido -->
-  <div *ngIf="!loading">
+  <!-- ✅ si hay reporte, muestra contenido -->
+  <ng-container *ngIf="reporte$ | async as reporte; else cargando">
 
-    <h2>📘 Mis tutorías agendadas</h2>
-
-    <!-- ✅ Botón PDF SIEMPRE visible -->
+    <!-- ✅ Botón PDF visible (se desactiva si no hay reporte) -->
     <button (click)="descargarPDF()" [disabled]="!reporte">
       📄 Descargar reporte en PDF
     </button>
 
     <hr />
 
-    <!-- Cuando hay reporte -->
-    <div *ngIf="reporte">
+    <!-- ✅ Lista de tutorías -->
+    <div *ngIf="reporte?.inscripciones?.length > 0; else sinTutorias">
 
-      <!-- Lista de inscripciones -->
-      <div *ngIf="reporte.inscripciones?.length > 0; else sinTutorias">
-
-        <div *ngFor="let i of reporte.inscripciones" class="card">
-          <p><strong>Tutor:</strong> {{ i.tutoria?.tutor?.user?.nombre }}</p>
-          <p><strong>Asignatura:</strong> {{ i.tutoria?.materia }}</p>
-          <p><strong>Fecha:</strong> {{ i.tutoria?.fecha | date:'shortDate' }}</p>
-          <p><strong>Hora:</strong> {{ i.tutoria?.hora }}</p>
-          <p><strong>Estado:</strong> {{ i.tutoria?.estado }}</p>
-        </div>
-
+      <div *ngFor="let i of reporte.inscripciones" class="card">
+        <p><strong>Tutor:</strong> {{ i.tutoria?.tutor?.user?.nombre }}</p>
+        <p><strong>Asignatura:</strong> {{ i.tutoria?.materia }}</p>
+        <p><strong>Fecha:</strong> {{ i.tutoria?.fecha | date:'shortDate' }}</p>
+        <p><strong>Hora:</strong> {{ i.tutoria?.hora }}</p>
+        <p><strong>Estado:</strong> {{ i.tutoria?.estado }}</p>
       </div>
-
-      <!-- Sin tutorías -->
-      <ng-template #sinTutorias>
-        <p>No tienes tutorías agendadas.</p>
-      </ng-template>
 
     </div>
 
-  </div>
+    <ng-template #sinTutorias>
+      <p>No tienes tutorías agendadas.</p>
+    </ng-template>
+
+  </ng-container>
+
+  <!-- ⏳ Mientras carga -->
+  <ng-template #cargando>
+    <p><strong>Cargando reporte...</strong></p>
+  </ng-template>
 
 </div>
