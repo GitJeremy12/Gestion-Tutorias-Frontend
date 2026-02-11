@@ -1,0 +1,48 @@
+<h2>Editar Tutoría</h2>
+
+<form (ngSubmit)="guardar()">
+
+  <div class="mb-3">
+    <label>Materia</label>
+    <input
+      type="text"
+      class="form-control"
+      [(ngModel)]="form.materia"
+      name="materia"
+      required>
+  </div>
+
+  <div class="mb-3">
+    <label>Tema</label>
+    <input
+      type="text"
+      class="form-control"
+      [(ngModel)]="form.tema"
+      name="tema">
+  </div>
+
+  <div class="mb-3">
+    <label>Observaciones</label>
+    <textarea
+      class="form-control"
+      [(ngModel)]="form.observaciones"
+      name="observaciones">
+    </textarea>
+  </div>
+
+  <div class="mb-3">
+    <label>Duración (min)</label>
+    <input
+      type="number"
+      class="form-control"
+      [(ngModel)]="form.duracion"
+      name="duracion"
+      min="1">
+  </div>
+
+  <button
+    class="btn btn-primary"
+    [disabled]="loading">
+    Guardar cambios
+  </button>
+</form>

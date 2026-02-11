@@ -1,0 +1,317 @@
+<div class="register-tutoria-container">
+  <!-- Loading Overlay con opción de debug -->
+  <div class="loading-overlay" *ngIf="cargandoPerfil">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Cargando información del tutor...</p>
+      <p class="loading-subtext">Esto puede tomar unos segundos</p>
+
+      <!-- Botón de emergencia para desarrollo -->
+      <button class="btn-skip-loading" (click)="saltarCarga()" title="Solo para desarrollo">
+        ⚠️ Saltar carga (desarrollo)
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="form-header">
+    <div class="header-icon">📝</div>
+    <div class="header-text">
+      <h1>Crear Nueva Tutoría</h1>
+      <p class="subtitle">Completa la información para registrar una nueva sesión</p>
+    </div>
+  </div>
+
+  <!-- Mensajes de error/éxito -->
+  <div class="alert alert-success" *ngIf="success">
+    <span class="alert-icon">✓</span>
+    <span class="alert-text">{{ success }}</span>
+  </div>
+
+  <div class="alert alert-error" *ngIf="error">
+    <span class="alert-icon">⚠</span>
+    <div class="alert-content">
+      <span class="alert-text">{{ error }}</span>
+      <button class="btn-retry" (click)="cargarPerfilTutor()" *ngIf="!cargandoPerfil && !tutorId">
+        🔄 Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <form #f="ngForm" (ngSubmit)="guardar(f)" class="tutoria-form" *ngIf="!cargandoPerfil">
+
+    <!-- Información Básica -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <span class="section-icon">📅</span>
+        Información Básica
+      </h3>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="fechaHora" class="form-label">
+            Fecha y Hora
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">🕐</span>
+            <input
+              type="datetime-local"
+              id="fechaHora"
+              name="fechaHora"
+              class="form-input"
+              [(ngModel)]="form.fecha"
+              #fechaHora="ngModel"
+              required
+              [min]="getMinDateTime()"
+              [max]="getMaxDateTime()"
+              (focus)="limpiarMensajes()">
+          </div>
+          <span class="error-message" *ngIf="fechaHora.invalid && (fechaHora.dirty || fechaHora.touched)">
+            La fecha y hora es requerida
+          </span>
+          <span class="help-text">Selecciona la fecha y hora de la tutoría</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="materia" class="form-label">
+            Materia
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">📚</span>
+            <input
+              type="text"
+              id="materia"
+              name="materia"
+              class="form-input"
+              placeholder="Ej: Cálculo Diferencial"
+              [(ngModel)]="form.materia"
+              #materia="ngModel"
+              required
+              maxlength="100"
+              (focus)="limpiarMensajes()">
+          </div>
+          <span class="error-message" *ngIf="materia.invalid && (materia.dirty || materia.touched)">
+            La materia es requerida
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="tema" class="form-label">
+            Tema
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">📖</span>
+            <input
+              type="text"
+              id="tema"
+              name="tema"
+              class="form-input"
+              placeholder="Ej: Derivadas y sus aplicaciones"
+              [(ngModel)]="form.tema"
+              #tema="ngModel"
+              required
+              maxlength="150"
+              (focus)="limpiarMensajes()">
+          </div>
+          <span class="error-message" *ngIf="tema.invalid && (tema.dirty || tema.touched)">
+            El tema es requerido
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="descripcion" class="form-label">
+            Descripción
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon textarea-icon">📝</span>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              class="form-textarea"
+              placeholder="Describe los objetivos y contenidos de la tutoría..."
+              [(ngModel)]="form.descripcion"
+              rows="4"
+              maxlength="500"
+              (focus)="limpiarMensajes()"></textarea>
+          </div>
+          <span class="char-counter" *ngIf="form.descripcion">
+            {{ form.descripcion.length }}/500 caracteres
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuración -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <span class="section-icon">⚙️</span>
+        Configuración
+      </h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="duracion" class="form-label">
+            Duración (minutos)
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">⏱️</span>
+            <input
+              type="number"
+              id="duracion"
+              name="duracion"
+              class="form-input"
+              [(ngModel)]="form.duracion"
+              #duracion="ngModel"
+              required
+              min="15"
+              max="300"
+              step="15"
+              (focus)="limpiarMensajes()">
+          </div>
+          <span class="error-message" *ngIf="duracion.invalid && (duracion.dirty || duracion.touched)">
+            Duración entre 15 y 300 minutos
+          </span>
+          <span class="help-text">Duración estimada de la sesión</span>
+        </div>
+
+        <div class="form-group">
+          <label for="cupoMaximo" class="form-label">
+            Cupo Máximo
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">👥</span>
+            <input
+              type="number"
+              id="cupoMaximo"
+              name="cupoMaximo"
+              class="form-input"
+              [(ngModel)]="form.cupoMaximo"
+              #cupoMaximo="ngModel"
+              required
+              min="1"
+              max="50"
+              (focus)="limpiarMensajes()">
+          </div>
+          <span class="error-message" *ngIf="cupoMaximo.invalid && (cupoMaximo.dirty || cupoMaximo.touched)">
+            Cupo entre 1 y 50 estudiantes
+          </span>
+          <span class="help-text">Número máximo de estudiantes</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="modalidad" class="form-label">
+            Modalidad
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              {{ form.modalidad === 'presencial' ? '🏫' : form.modalidad === 'virtual' ? '💻' : '🔄' }}
+            </span>
+            <select
+              id="modalidad"
+              name="modalidad"
+              class="form-select"
+              [(ngModel)]="form.modalidad"
+              (focus)="limpiarMensajes()">
+              <option value="presencial">🏫 Presencial</option>
+              <option value="virtual">💻 Virtual</option>
+              <option value="hibrida">🔄 Híbrida</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="ubicacion" class="form-label">
+            Ubicación
+            <span class="help-text-inline" *ngIf="form.modalidad === 'virtual'">(URL de reunión)</span>
+            <span class="help-text-inline" *ngIf="form.modalidad === 'presencial'">(Aula/Edificio)</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              {{ form.modalidad === 'virtual' ? '🔗' : '📍' }}
+            </span>
+            <input
+              type="text"
+              id="ubicacion"
+              name="ubicacion"
+              class="form-input"
+              [placeholder]="form.modalidad === 'virtual' ? 'https://meet.google.com/...' : 'Ej: Aula 201, Edificio A'"
+              [(ngModel)]="form.ubicacion"
+              maxlength="200"
+              (focus)="limpiarMensajes()">
+          </div>
+          <span class="help-text">
+            {{ form.modalidad === 'virtual' ? 'Link de la reunión virtual' : 'Lugar físico donde se realizará' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="form-summary" *ngIf="form.materia && form.tema">
+      <h4 class="summary-title">📋 Resumen</h4>
+      <div class="summary-content">
+        <div class="summary-item">
+          <span class="summary-label">Materia:</span>
+          <span class="summary-value">{{ form.materia }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Tema:</span>
+          <span class="summary-value">{{ form.tema }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Duración:</span>
+          <span class="summary-value">{{ form.duracion }} minutos</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Cupo:</span>
+          <span class="summary-value">{{ form.cupoMaximo }} estudiantes</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Modalidad:</span>
+          <span class="summary-value">
+            {{ form.modalidad === 'presencial' ? '🏫 Presencial' : form.modalidad === 'virtual' ? '💻 Virtual' : '🔄 Híbrida' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancelar()"
+        [disabled]="guardando">
+        <span class="btn-icon">✕</span>
+        Cancelar
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="guardando || f.invalid">
+        <span class="btn-icon" *ngIf="!guardando">✓</span>
+        <span class="btn-spinner" *ngIf="guardando"></span>
+        {{ guardando ? 'Guardando...' : 'Crear Tutoría' }}
+      </button>
+    </div>
+
+    <!-- Nota de campos requeridos -->
+    <p class="form-note">
+      <span class="required">*</span> Campos obligatorios
+    </p>
+  </form>
+</div>

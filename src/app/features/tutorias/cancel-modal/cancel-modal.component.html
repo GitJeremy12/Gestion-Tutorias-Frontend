@@ -1,0 +1,75 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="icon-warning">⚠️</div>
+      <h3>Cancelar Tutoría</h3>
+      <button class="btn-close" (click)="cerrar.emit()" [disabled]="loading">
+        <span>✕</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="confirmation-text">
+        ¿Estás seguro de que deseas cancelar esta tutoría?
+      </p>
+
+      <div class="tutoria-info">
+        <div class="info-row">
+          <span class="info-icon">📚</span>
+          <div class="info-content">
+            <span class="info-label">Materia</span>
+            <span class="info-value">{{ tutoria.materia }}</span>
+          </div>
+        </div>
+
+        <div class="info-row" *ngIf="tutoria.tema">
+          <span class="info-icon">📖</span>
+          <div class="info-content">
+            <span class="info-label">Tema</span>
+            <span class="info-value">{{ tutoria.tema }}</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <span class="info-icon">📅</span>
+          <div class="info-content">
+            <span class="info-label">Fecha y Hora</span>
+            <span class="info-value">{{ tutoria.fecha | date:'fullDate':'':'es-ES' }} - {{ tutoria.fecha | date:'HH:mm' }}</span>
+          </div>
+        </div>
+
+        <div class="info-row" *ngIf="tutoria.tutor">
+          <span class="info-icon">👨‍🏫</span>
+          <div class="info-content">
+            <span class="info-label">Tutor</span>
+            <span class="info-value">{{ tutoria.tutor.nombre }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warning-message">
+        <span class="warning-icon">ℹ️</span>
+        <p>Esta acción no se puede deshacer. El tutor será notificado de la cancelación.</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        class="btn-secondary"
+        (click)="cerrar.emit()"
+        [disabled]="loading">
+        <span>Volver</span>
+      </button>
+      <button
+        class="btn-danger"
+        (click)="confirmar()"
+        [disabled]="loading">
+        <span *ngIf="!loading">Confirmar Cancelación</span>
+        <span *ngIf="loading" class="loading-content">
+          <span class="spinner"></span>
+          Cancelando...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

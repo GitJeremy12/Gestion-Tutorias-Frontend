@@ -1,0 +1,36 @@
+<div class="schedule-container">
+
+  <h2>Inscribirse a una tutoría</h2>
+
+  <div class="form-group">
+    <label for="tutoria">Tutorías disponibles</label>
+
+    <select
+      id="tutoria"
+      [(ngModel)]="tutoriaSeleccionada"
+      name="tutoria">
+
+      <option value="" disabled selected>
+        Selecciona una tutoría
+      </option>
+
+      <option *ngFor="let t of tutorias" [value]="t.id">
+        📘 {{ t.materia }} – {{ t.tema }}
+        | 🕐 {{ t.fecha | date:'short' }}
+      </option>
+
+    </select>
+  </div>
+
+  <p class="success" *ngIf="success">{{ success }}</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <button
+    (click)="confirmar()"
+    [disabled]="loading || !tutoriaSeleccionada">
+
+    {{ loading ? 'Procesando...' : 'Confirmar inscripción' }}
+
+  </button>
+
+</div>

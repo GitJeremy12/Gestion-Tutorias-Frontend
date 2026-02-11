@@ -1,0 +1,197 @@
+<!-- register.component.html -->
+<div class="register-container">
+  <div class="register-card">
+
+    <h2>Crear Cuenta</h2>
+    <p class="subtitle">Sistema de Tutorías</p>
+
+    <form (ngSubmit)="registrar()">
+
+      <!-- ── Sección: Datos Generales ── -->
+      <div class="section section-general">
+        <h3>Datos Generales</h3>
+
+        <div class="form-group">
+          <label for="nombre">Nombre Completo *</label>
+          <input
+            type="text"
+            id="nombre"
+            [(ngModel)]="form.nombre"
+            name="nombre"
+            placeholder="Juan Pérez"
+            [disabled]="loading"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="form.email"
+            name="email"
+            placeholder="correo@espam.edu.ec"
+            [disabled]="loading"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña * (mínimo 6 caracteres)</label>
+          <input
+            type="password"
+            id="password"
+            [(ngModel)]="form.password"
+            name="password"
+            placeholder="••••••••"
+            [disabled]="loading"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="rol">Tipo de Usuario *</label>
+          <select
+            id="rol"
+            [(ngModel)]="form.rol"
+            name="rol"
+            [disabled]="loading"
+            required
+          >
+            <option value="">Seleccione...</option>
+            <option value="estudiante">Estudiante</option>
+            <option value="tutor">Tutor</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── Sección: Datos de Estudiante (visible solo si rol === 'estudiante') ── -->
+      <div *ngIf="isEstudiante()" class="section section-extra">
+        <h3>Datos de Estudiante</h3>
+
+        <div class="form-group">
+          <label for="matricula">Matrícula *</label>
+          <input
+            type="text"
+            id="matricula"
+            [(ngModel)]="form.matricula"
+            name="matricula"
+            placeholder="A12345678"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="carrera">Carrera *</label>
+          <input
+            type="text"
+            id="carrera"
+            [(ngModel)]="form.carrera"
+            name="carrera"
+            placeholder="Ingeniería en Sistemas"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="semestre">Semestre *</label>
+            <input
+              type="number"
+              id="semestre"
+              [(ngModel)]="form.semestre"
+              name="semestre"
+              placeholder="1-12"
+              min="1"
+              max="12"
+              [disabled]="loading"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="telefono">Teléfono (opcional)</label>
+            <input
+              type="tel"
+              id="telefono"
+              [(ngModel)]="form.telefono"
+              name="telefono"
+              placeholder="0999999999"
+              [disabled]="loading"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Sección: Datos de Tutor (visible solo si rol === 'tutor') ── -->
+      <div *ngIf="isTutor()" class="section section-extra">
+        <h3>Datos de Tutor</h3>
+
+        <div class="form-group">
+          <label for="especialidad">Especialidad *</label>
+          <input
+            type="text"
+            id="especialidad"
+            [(ngModel)]="form.especialidad"
+            name="especialidad"
+            placeholder="Programación, Matemáticas, etc."
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="departamento">Departamento *</label>
+          <input
+            type="text"
+            id="departamento"
+            [(ngModel)]="form.departamento"
+            name="departamento"
+            placeholder="Ciencias de la Computación"
+            [disabled]="loading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="disponibilidad">Disponibilidad (opcional)</label>
+          <textarea
+            id="disponibilidad"
+            [(ngModel)]="form.disponibilidad"
+            name="disponibilidad"
+            rows="3"
+            placeholder="Lunes a Viernes 8:00 - 12:00"
+            [disabled]="loading"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- ── Alertas ── -->
+      <div *ngIf="success" class="alert alert-success">
+        {{ success }}
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <!-- ── Botón ── -->
+      <button
+        type="submit"
+        [disabled]="loading || !form.rol"
+        class="btn-primary"
+      >
+        <span *ngIf="!loading">Registrarse</span>
+        <span *ngIf="loading" class="btn-loading">
+          <span class="spinner"></span>
+          Registrando...
+        </span>
+      </button>
+
+    </form>
+
+    <!-- Link a login -->
+    <div class="footer-links">
+      <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión aquí</a></p>
+    </div>
+
+  </div>
+</div>

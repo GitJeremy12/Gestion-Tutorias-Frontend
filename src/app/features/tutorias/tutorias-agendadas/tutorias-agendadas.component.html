@@ -1,0 +1,45 @@
+<div class="container">
+
+  <!-- Cargando -->
+  <div *ngIf="loading">
+    <p><strong>Cargando reporte...</strong></p>
+  </div>
+
+  <!-- Contenido -->
+  <div *ngIf="!loading">
+
+    <h2>📘 Mis tutorías agendadas</h2>
+
+    <!-- ✅ Botón PDF SIEMPRE visible -->
+    <button (click)="descargarPDF()" [disabled]="!reporte">
+      📄 Descargar reporte en PDF
+    </button>
+
+    <hr />
+
+    <!-- Cuando hay reporte -->
+    <div *ngIf="reporte">
+
+      <!-- Lista de inscripciones -->
+      <div *ngIf="reporte.inscripciones?.length > 0; else sinTutorias">
+
+        <div *ngFor="let i of reporte.inscripciones" class="card">
+          <p><strong>Tutor:</strong> {{ i.tutoria?.tutor?.user?.nombre }}</p>
+          <p><strong>Asignatura:</strong> {{ i.tutoria?.materia }}</p>
+          <p><strong>Fecha:</strong> {{ i.tutoria?.fecha | date:'shortDate' }}</p>
+          <p><strong>Hora:</strong> {{ i.tutoria?.hora }}</p>
+          <p><strong>Estado:</strong> {{ i.tutoria?.estado }}</p>
+        </div>
+
+      </div>
+
+      <!-- Sin tutorías -->
+      <ng-template #sinTutorias>
+        <p>No tienes tutorías agendadas.</p>
+      </ng-template>
+
+    </div>
+
+  </div>
+
+</div>

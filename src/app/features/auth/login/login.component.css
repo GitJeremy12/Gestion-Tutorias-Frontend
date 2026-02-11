@@ -1,0 +1,386 @@
+/* ============================================================
+   login.component.css — Sistema de Tutorías ESPAM MFL
+   Paleta institucional: Verde ESPAM · Naranja · Dorado/Beige
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap');
+
+/* ── Variables institucionales ESPAM MFL ── */
+:root {
+  --espam-verde-oscuro:  #1a5c2a;
+  --espam-verde:         #2e7d32;
+  --espam-verde-medio:   #3d8b40;
+  --espam-verde-claro:   #e8f5e9;
+  --espam-naranja:       #e65c00;
+  --espam-naranja-claro: #ff8c42;
+  --espam-dorado:        #c8a84b;
+  --espam-beige:         #f5f0e8;
+  --espam-beige-oscuro:  #e8dcc8;
+  --text-dark:           #1c2b1e;
+  --text-medium:         #3d5040;
+  --text-light:          #6b7c6e;
+  --white:               #ffffff;
+  --danger:              #c62828;
+  --danger-bg:           #ffebee;
+  --warning:             #e65100;
+  --warning-bg:          #fff3e0;
+  --shadow-sm:   0 2px 8px rgba(26, 92, 42, 0.10);
+  --shadow-md:   0 8px 32px rgba(26, 92, 42, 0.15);
+  --shadow-lg:   0 20px 60px rgba(26, 92, 42, 0.20);
+  --radius:      16px;
+  --radius-sm:   10px;
+  --transition:  0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Reset base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Contenedor principal ── */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: var(--espam-beige);
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(46, 125, 50, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(230, 92, 0, 0.09) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232e7d32' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  position: relative;
+  font-family: 'Nunito', sans-serif;
+}
+
+.login-container::before {
+  content: '';
+  position: fixed;
+  top: -80px; left: -80px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(46, 125, 50, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-container::after {
+  content: '';
+  position: fixed;
+  bottom: -60px; right: -60px;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(230, 92, 0, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Tarjeta principal ── */
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 2.75rem 2.5rem 2.5rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(200, 168, 75, 0.25);
+  position: relative;
+  overflow: hidden;
+  animation: cardEntrada 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    var(--espam-verde-oscuro) 0%,
+    var(--espam-verde)        40%,
+    var(--espam-dorado)       70%,
+    var(--espam-naranja)      100%
+  );
+}
+
+.login-card::after {
+  content: 'ESPAM MFL';
+  position: absolute;
+  bottom: 1.5rem; right: 1.75rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(46, 125, 50, 0.12);
+  text-transform: uppercase;
+  pointer-events: none; user-select: none;
+}
+
+/* ── Logo institucional ── */
+.logo-area {
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+
+.logo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--espam-verde) 0%, var(--espam-verde-oscuro) 100%);
+  box-shadow: 0 6px 20px rgba(26, 92, 42, 0.28);
+}
+
+.logo-badge svg {
+  width: 32px; height: 32px;
+  fill: white;
+}
+
+/* ── Encabezado ── */
+.login-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 700;
+  color: var(--espam-verde-oscuro);
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 0.875rem; font-weight: 600;
+  color: var(--espam-naranja);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--espam-beige-oscuro);
+  position: relative;
+}
+
+.subtitle::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 48px; height: 2px;
+  background: var(--espam-verde);
+  border-radius: 2px;
+}
+
+/* ── Formulario ── */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.form-group label {
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--text-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem 1.05rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem; font-weight: 500;
+  color: var(--text-dark);
+  background: var(--espam-beige);
+  border: 1.5px solid var(--espam-beige-oscuro);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition:
+    border-color var(--transition),
+    background   var(--transition),
+    box-shadow   var(--transition);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-group input::placeholder {
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+.form-group input:focus {
+  border-color: var(--espam-verde-medio);
+  background: var(--white);
+  box-shadow: 0 0 0 3.5px rgba(46, 125, 50, 0.12);
+}
+
+.form-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--espam-beige-oscuro);
+}
+
+/* ── Alertas ── */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-weight: 600;
+  line-height: 1.4;
+  animation: alertFade 0.35s ease both;
+}
+
+.alert-warning {
+  background-color: var(--warning-bg);
+  border: 1.5px solid rgba(230, 81, 0, 0.30);
+  color: var(--warning);
+}
+
+.alert-danger {
+  background-color: var(--danger-bg);
+  border: 1.5px solid rgba(198, 40, 40, 0.25);
+  color: var(--danger);
+}
+
+/* ── Botón principal ── */
+.btn-primary {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--espam-verde) 0%, var(--espam-verde-oscuro) 100%);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform  var(--transition),
+    box-shadow var(--transition),
+    opacity    var(--transition);
+  box-shadow: 0 4px 16px rgba(26, 92, 42, 0.30);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.55s ease;
+}
+
+.btn-primary:hover:not(:disabled)::before {
+  transform: translateX(100%);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26, 92, 42, 0.38);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(26, 92, 42, 0.22);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Estado de carga dentro del botón ── */
+.btn-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Footer links ── */
+.footer-links {
+  margin-top: 1.5rem;
+  text-align: center;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--espam-beige-oscuro);
+}
+
+.footer-links p {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.footer-links a {
+  color: var(--espam-verde);
+  font-weight: 700;
+  text-decoration: none;
+  position: relative;
+  transition: color var(--transition);
+}
+
+.footer-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0;
+  width: 0; height: 1.5px;
+  background: var(--espam-naranja);
+  transition: width var(--transition);
+}
+
+.footer-links a:hover {
+  color: var(--espam-naranja);
+}
+
+.footer-links a:hover::after {
+  width: 100%;
+}
+
+/* ── Animaciones ── */
+@keyframes cardEntrada {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes alertFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 2.25rem 1.5rem 2rem;
+    border-radius: 14px;
+  }
+
+  .login-card h2 {
+    font-size: 1.7rem;
+  }
+}

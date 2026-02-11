@@ -1,0 +1,243 @@
+<div class="reporte-estudiante-container">
+  <div class="reporte-header">
+    <h2>Reporte por Estudiante</h2>
+    <p class="subtitle">Consulta el historial de tutorías de cada estudiante</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-section">
+    <h3 class="section-title">
+      <span class="title-icon">🔍</span>
+      Filtros de Búsqueda
+    </h3>
+
+    <div class="filtros-grid">
+      <div class="form-group full-width">
+        <label for="estudianteId">
+          <span class="label-icon">👨‍🎓</span>
+          Seleccionar Estudiante
+        </label>
+        <select
+          [(ngModel)]="estudianteId"
+          id="estudianteId"
+          name="estudianteId"
+          [class.selected]="estudianteId">
+          <option value="" disabled>Selecciona un estudiante</option>
+          <option *ngFor="let e of estudiantes" [value]="e.id">
+            {{ e.nombre }} - {{ e.matricula || 'Sin matrícula' }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="desde">
+          <span class="label-icon">📅</span>
+          Fecha Desde
+        </label>
+        <input
+          type="date"
+          [(ngModel)]="desde"
+          id="desde"
+          name="desde"
+          [max]="hasta || getMaxDate()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="hasta">
+          <span class="label-icon">📅</span>
+          Fecha Hasta
+        </label>
+        <input
+          type="date"
+          [(ngModel)]="hasta"
+          id="hasta"
+          name="hasta"
+          [min]="desde"
+          [max]="getMaxDate()"
+        />
+      </div>
+    </div>
+
+    <div class="filtros-actions">
+      <button
+        class="btn-clear"
+        (click)="limpiarFiltros()"
+        *ngIf="estudianteId || desde || hasta">
+        <span>🔄</span>
+        Limpiar Filtros
+      </button>
+      <button
+        class="btn-generate"
+        (click)="generar()"
+        [disabled]="!estudianteId || generando">
+        <span *ngIf="!generando">
+          <span class="btn-icon">📊</span>
+          Generar Reporte
+        </span>
+        <span *ngIf="generando" class="loading-content">
+          <span class="spinner"></span>
+          Generando...
+        </span>
+      </button>
+    </div>
+
+    <!-- Mensaje -->
+    <div class="mensaje-container" *ngIf="mensaje">
+      <p class="mensaje" [class.error]="esError" [class.info]="!esError">
+        <span class="mensaje-icon">{{ esError ? '⚠️' : 'ℹ️' }}</span>
+        {{ mensaje }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Información del estudiante seleccionado -->
+  <div class="estudiante-info" *ngIf="estudianteSeleccionado">
+    <h3 class="section-title">
+      <span class="title-icon">👨‍🎓</span>
+      Información del Estudiante
+    </h3>
+    <div class="info-cards">
+      <div class="info-card">
+        <span class="info-icon">📝</span>
+        <div class="info-content">
+          <span class="info-label">Nombre</span>
+          <span class="info-value">{{ estudianteSeleccionado.nombre }}</span>
+        </div>
+      </div>
+      <div class="info-card" *ngIf="estudianteSeleccionado.matricula">
+        <span class="info-icon">🎓</span>
+        <div class="info-content">
+          <span class="info-label">Matrícula</span>
+          <span class="info-value">{{ estudianteSeleccionado.matricula }}</span>
+        </div>
+      </div>
+      <div class="info-card" *ngIf="estudianteSeleccionado.carrera">
+        <span class="info-icon">📚</span>
+        <div class="info-content">
+          <span class="info-label">Carrera</span>
+          <span class="info-value">{{ estudianteSeleccionado.carrera }}</span>
+        </div>
+      </div>
+      <div class="info-card" *ngIf="estudianteSeleccionado.semestre">
+        <span class="info-icon">📖</span>
+        <div class="info-content">
+          <span class="info-label">Semestre</span>
+          <span class="info-value">{{ estudianteSeleccionado.semestre }}°</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumen estadístico -->
+  <div class="estadisticas-section" *ngIf="tutorias.length > 0">
+    <h3 class="section-title">
+      <span class="title-icon">📈</span>
+      Resumen Estadístico
+    </h3>
+    <div class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">📚</div>
+        <div class="stat-info">
+          <span class="stat-label">Total Tutorías</span>
+          <span class="stat-value">{{ tutorias.length }}</span>
+        </div>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">📖</div>
+        <div class="stat-info">
+          <span class="stat-label">Materias Distintas</span>
+          <span class="stat-value">{{ getMateriasUnicas() }}</span>
+        </div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-info">
+          <span class="stat-label">Horas Totales</span>
+          <span class="stat-value">{{ getHorasTotales() }}h</span>
+        </div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">👨‍🏫</div>
+        <div class="stat-info">
+          <span class="stat-label">Tutores Distintos</span>
+          <span class="stat-value">{{ getTutoresUnicos() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de tutorías -->
+  <div class="tabla-section" *ngIf="tutorias.length > 0">
+    <div class="tabla-header">
+      <h3 class="section-title">
+        <span class="title-icon">📋</span>
+        Detalle de Tutorías
+      </h3>
+      <div class="tabla-actions">
+        <button class="btn-export pdf" (click)="exportarPDF()" [disabled]="exportando">
+          <span class="export-icon">📄</span>
+          PDF
+        </button>
+        <button class="btn-export excel" (click)="exportarExcel()" [disabled]="exportando">
+          <span class="export-icon">📊</span>
+          Excel
+        </button>
+        <button class="btn-export csv" (click)="exportarCSV()" [disabled]="exportando">
+          <span class="export-icon">📋</span>
+          CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="tutorias-table">
+        <thead>
+          <tr>
+            <th>Fecha y Hora</th>
+            <th>Materia</th>
+            <th>Tema</th>
+            <th>Tutor</th>
+            <th>Duración</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of tutorias; let i = index" [class.row-even]="i % 2 === 0">
+            <td data-label="Fecha y Hora">
+              <div class="date-cell">
+                <span class="date-day">{{ t.fechaHora | date:'dd/MM/yyyy' }}</span>
+                <span class="date-time">{{ t.fechaHora | date:'HH:mm' }}</span>
+              </div>
+            </td>
+            <td data-label="Materia">
+              <span class="materia-badge">{{ t.materia }}</span>
+            </td>
+            <td data-label="Tema">
+              <span class="tema-text">{{ t.tema || 'Sin tema especificado' }}</span>
+            </td>
+            <td data-label="Tutor">
+              <div class="tutor-cell">
+                <span class="tutor-icon">👨‍🏫</span>
+                <span class="tutor-name">{{ t.tutor?.nombre || 'N/A' }}</span>
+              </div>
+            </td>
+            <td data-label="Duración">
+              <span class="duracion-badge">{{ t.duracion || 60 }} min</span>
+            </td>
+            <td data-label="Observaciones">
+              <span class="observaciones-text">{{ t.observaciones || 'Sin observaciones' }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="!tutorias.length && reporteGenerado && !mensaje">
+    <div class="empty-icon">📚</div>
+    <h3>No se encontraron tutorías</h3>
+    <p>No hay tutorías registradas para los filtros seleccionados</p>
+  </div>
+</div>

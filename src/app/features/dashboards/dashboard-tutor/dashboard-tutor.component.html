@@ -1,0 +1,223 @@
+<!-- dashboard-tutor.component.html -->
+<div class="dashboard-container">
+
+  <!-- ── Loading Overlay — controlado por loading = true del TS ── -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="skeleton-stats">
+      <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+    </div>
+  </div>
+
+  <!-- ── Header ── -->
+  <div class="dashboard-header">
+    <div class="header-content">
+
+      <div class="welcome-section">
+        <h1>Panel del Tutor</h1>
+        <!-- nombreUsuario viene de getUsuarioActual().nombre -->
+        <p class="subtitle">Bienvenido, {{ nombreUsuario }} 👨‍🏫</p>
+      </div>
+
+      <div class="header-actions">
+        <!-- refrescar() llama a cargarDashboard() en el TS -->
+        <button class="btn-refresh" (click)="refrescar()" [disabled]="loading" title="Actualizar datos">
+          <span class="refresh-icon" [class.spinning]="loading">↻</span>
+        </button>
+
+        <div class="user-info">
+          <div class="user-avatar tutor">
+            <span class="avatar-icon">👨‍🏫</span>
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ nombreUsuario }}</span>
+            <span class="user-role">Tutor Académico</span>
+            <!-- especialidad viene de getUsuarioActual().especialidad -->
+            <span class="user-extra" *ngIf="especialidad">{{ especialidad }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Estadísticas — ocultas mientras loading = true ── -->
+  <div class="stats-section" *ngIf="!loading">
+
+    <!-- tutoriasImpartidas, estudiantesAtendidos, tutoriasHoy, horasImpartidas
+         vienen de getEstadisticasTutor() en el TS -->
+    <div class="stat-card primary">
+      <div class="stat-icon">📚</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ tutoriasImpartidas }}</span>
+        <span class="stat-label">Tutorías Impartidas</span>
+      </div>
+    </div>
+
+    <div class="stat-card success">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ estudiantesAtendidos }}</span>
+        <span class="stat-label">Estudiantes</span>
+      </div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-icon">📅</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ tutoriasHoy }}</span>
+        <span class="stat-label">Tutorías Hoy</span>
+      </div>
+    </div>
+
+    <div class="stat-card info">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ horasImpartidas }}</span>
+        <span class="stat-label">Horas Totales</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Agenda del día
+         agendaHoy viene de getAgendaHoy() en el TS ── -->
+  <div class="agenda-section" *ngIf="agendaHoy && agendaHoy.length > 0">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="title-icon">📆</span>
+        Agenda de Hoy
+      </h2>
+      <button class="btn-secondary-refresh" (click)="refrescar()" [disabled]="loading" title="Actualizar agenda">
+        <span [class.spinning]="loading">↻</span> Actualizar
+      </button>
+    </div>
+
+    <div class="agenda-list">
+      <!-- *ngFor itera agendaHoy[] del TS -->
+      <div class="agenda-item" *ngFor="let tutoria of agendaHoy; let i = index">
+
+        <div class="agenda-index">{{ i + 1 }}</div>
+
+        <div class="agenda-time">
+          <span class="time-hour">{{ tutoria.hora }}</span>
+          <span class="time-period" *ngIf="tutoria.periodo">{{ tutoria.periodo }}</span>
+        </div>
+
+        <div class="agenda-content">
+          <h4 class="agenda-materia">{{ tutoria.materia }}</h4>
+          <p class="agenda-estudiante">
+            <span class="detail-icon">👨‍🎓</span>
+            {{ tutoria.estudiante }}
+          </p>
+          <span class="agenda-tema" *ngIf="tutoria.tema">
+            <span class="detail-icon">📖</span>
+            {{ tutoria.tema }}
+          </span>
+        </div>
+
+        <!-- modalidad: presencial = 🏫 / virtual = 💻 -->
+        <div class="agenda-modalidad" *ngIf="tutoria.modalidad">
+          <span>{{ tutoria.modalidad === 'presencial' ? '🏫' : '💻' }}</span>
+          <span class="modalidad-label">{{ tutoria.modalidad }}</span>
+        </div>
+
+        <!-- Estado con ngClass según tutoria.estado -->
+        <div
+          class="agenda-status"
+          [ngClass]="{
+            'status-pendiente':  tutoria.estado === 'Pendiente',
+            'status-en-curso':   tutoria.estado === 'En curso',
+            'status-completada': tutoria.estado === 'Completada',
+            'status-cancelada':  tutoria.estado === 'Cancelada'
+          }"
+        >
+          <span class="status-dot"></span>
+          {{ tutoria.estado }}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Estado vacío agenda ── -->
+  <div class="empty-agenda" *ngIf="!loading && (!agendaHoy || agendaHoy.length === 0)">
+    <div class="empty-icon">📅</div>
+    <h3>No tienes tutorías agendadas para hoy</h3>
+    <p>Disfruta tu día libre o revisa tus próximas sesiones</p>
+  </div>
+
+  <!-- ── Menú principal ── -->
+  <div class="menu-section">
+    <h2 class="section-title">
+      <span class="title-icon">🎯</span>
+      Gestión de Tutorías
+    </h2>
+
+    <div class="cards-grid">
+
+      <a routerLink="/registrar-tutoria" class="menu-card featured">
+        <div class="card-icon">📝</div>
+        <div class="card-content">
+          <h3 class="card-title">Registrar Tutoría</h3>
+          <p class="card-description">Registra una nueva sesión realizada</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/tutorias-agendadas" class="menu-card">
+        <div class="card-icon">📋</div>
+        <div class="card-content">
+          <h3 class="card-title">Tutorías Agendadas</h3>
+          <p class="card-description">Revisa tu agenda de sesiones</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/historial" class="menu-card">
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+          <h3 class="card-title">Mi Historial</h3>
+          <p class="card-description">Consulta todas tus tutorías impartidas</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/reporte-estudiante" class="menu-card">
+        <div class="card-icon">📄</div>
+        <div class="card-content">
+          <h3 class="card-title">Reporte por Estudiante</h3>
+          <p class="card-description">Consulta el progreso de tus estudiantes</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/reporte-semanal" class="menu-card">
+        <div class="card-icon">📈</div>
+        <div class="card-content">
+          <h3 class="card-title">Reporte Semanal</h3>
+          <p class="card-description">Estadísticas de tu actividad semanal</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <a routerLink="/perfil" class="menu-card">
+        <div class="card-icon">⚙️</div>
+        <div class="card-content">
+          <h3 class="card-title">Mi Perfil</h3>
+          <p class="card-description">Actualiza tu disponibilidad y datos</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ── Acciones rápidas — visibles solo cuando !loading ── -->
+  <div class="quick-actions" *ngIf="!loading">
+    <button class="quick-btn" (click)="refrescar()" title="Actualizar información">
+      <span class="quick-btn-icon">↻</span>
+      <span class="quick-btn-text">Actualizar</span>
+    </button>
+  </div>
+
+</div>
